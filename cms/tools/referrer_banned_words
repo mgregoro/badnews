@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+# $Id: referrer_banned_words 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# manage referrer banned words
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'Referrer Banned Words',
+                tool_name           =>          'referrer_banned_words',
+                description         =>          'Add or delete referrer banned words from the internal list',
+                menu_position       =>          '_top, Referrers',
+                sufficient_flags    =>          ['s', 'a']
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::ReferrerInterface;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $ri = BadNews::ReferrerInterface->new();
+my $error = {};
+
+# get function
+my $func = $q->param('func');
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        if ($func eq "add") {
+            my $word = $q->param('add_banned_word');
+            $ri->add_banned_word($word);
+            $bn->log($session->user, 'add_r_banned_word', $word);
+        } elsif ($func eq "delete") {
+            foreach my $param ($q->Vars) {
+                next if $param eq "func" or $param eq "add_banned_word";
+                if ($ri->remove_banned_word($param)) {
+                    $bn->log($session->user, 'remove_r_banned_word', $param);
+                }
+            }
+        }
+        print $q->header();
+        $tmpl->process('referrer_banned_words.tt2', { title     =>      'Referrer Banned Words',
+                                          error     =>      $error,
+                                          ri        =>      $ri,
+                                          tool_name =>      'Referrer Banned Words',
+                                          tool_icon =>      '../../theme_images/control_panel/04managearticle.gif' });
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

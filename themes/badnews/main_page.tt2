@@ -1,0 +1,267 @@
+[% IF fe.cgi.param('filter_type') %]
+    [% filter_type = fe.cgi.param('filter_type') %]
+[% ELSE %]
+    [% filter_type = 'All' %]
+[% END %]
+
+<html>
+<!-- $Id: main_page.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+        <title>[% fe.config.APP_WINDOW_TITLE %]</title>
+        <link href="style/badnews.css" rel="stylesheet" type="text/css">
+    </head>
+    <script language="javascript">
+        function openUrl(url) {
+            var oURL = url;
+            window.open(oURL, "comments", "width=280,height=280,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+        function pop_open_event(url, arg1, arg2)
+        {               
+            var gUrl = url + '?page=' + arg1 + '&event_id=' + arg2;
+            window.open(gUrl, "event" + arg2, "width=540,height=380,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+        function pop_open_daycal(url, arg1, arg2, arg3, arg4)
+        {                   
+            var gUrl = url + '?page=' + arg1 + '&day=' + arg2 + '&month=' + arg3 + '&year=' + arg4;
+            window.open(gUrl, "daycal" + arg2 + arg3 + arg4, "width=640, height=480,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+    </script>
+    <body>
+        <form name="article_search" action="" method="POST">
+            <input type="hidden" name="page" value="search">
+            <div class="search_place">Search:&nbsp;&nbsp;<input type="text" size="24" maxlength="128" name="search_string" class="tiny_text">
+                    &nbsp;&nbsp;<input type="submit" value="Search" class="tiny_text"></div>
+        </form>
+        <form name="article_type" action="" method="post">
+        <input type="hidden" name="page" value="main_page">
+        <div class="cat_place">Category:&nbsp;&nbsp;<select name="filter_type"  onChange="javascript:document.article_type.submit();">
+                <option selected value="[% filter_type %]">[% filter_type %]</option>
+                [% FOREACH type = fe.ai.list_non_system_categories %]
+                [% NEXT IF type == filter_type %]
+                <option value="[% type %]">[% type %]</option>
+                [% END %]
+                [% IF filter_type != "All" %]
+                <option value="All">All</option>
+                [% END %]
+            </select>&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+        </form>
+        <div class="title_place">[% fe.config.APP_TITLE %]</div>
+    <div class="overlay">the badnews content management system [% fe.tc.test %]</div>
+    <div class="counter">Page Views: <span id="counter_number">&nbsp;</span></div>
+    <div class="main_column">
+        [% i = 0 %]
+        [% FOREACH article = fe.ai.articles_by_category(filter_type, 'create', 5) %]
+        [% i = i + 1 %]
+        <div class="article_spacer"><img src="images/nothing.gif" height="6" width="1"></div>
+        <div class="article">
+            [% author = fe.author_by_name(article.author) %]
+            <div class="subject_text">
+                [% article.subject %] <font class="subject_alt">by</font> [% author.common_name %] <font class="subject_alt">@</font> [% fe.ai.pretty_date(article.create_time) %]
+            </div>
+            <p class="body_text">[% article.body %]</p>
+            [% IF article.enable_comments %]
+                [% comment_count = article.count_comments %]
+                [% comment_i = 0 %]
+                [% FOREACH comment = article.comments %]
+                    [% comment_i = comment_i + 1 %]
+                    <div class="comment_depth_[% comment.level %]">
+                        <b>Comment</b> by 
+                        [% IF comment.url %]
+                        <a href="[% comment.url %]" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] <a href="javascript:openUrl('?page=leave_comment&article_id=[% article.id %]&irt=[% comment.id %]')" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="Reply to this comment">&nbsp;[REPLY]&nbsp;</a><br><br>
+                        [% ELSE %]
+                        [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] <a href="javascript:openUrl('?page=leave_comment&article_id=[% article.id %]&irt=[% comment.id %]')" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="Reply to this comment">&nbsp;[reply]&nbsp;</a><br><br>
+                        [% END %]
+                            [% comment.comment %]
+                    </div>
+                    [% UNLESS comment_i == comment_count %]
+                        <div class="comment_spacer"></div>
+                    [% END %]
+                [% END %]
+            <div class="tiny_text" align="right">
+                <a href="javascript:openUrl('?page=leave_comment&article_id=[% article.id %]')" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'">Leave A Comment</a>
+            </div>
+
+            [% END %]
+            <div class="tiny_text" align="right">
+            [% IF article.files %]
+                Files: 
+                [% FOREACH file = article.files %]
+                <a href="/files/[% file.name %]" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a> 
+                [% END %]
+                [% IF article.links %]
+                    / 
+                [% END %]
+            [% END %]
+            [% IF article.links %]
+                Links:
+                [% FOREACH link = article.links %]
+                <a href="[% link.url %]" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="[% link.long_name %]" target="_new">[% link.short_name %]</a> 
+                [% END %]
+            [% END %]
+            </div>
+        </div>
+        [% UNLESS article.is_last %]
+            [% IF article.files || article.links || article.enable_comments %]
+                <div class="article_spacer"><img src="images/nothing.gif" height="3" width="1"></div>
+            [% END %]
+            <div class="css_dotted"></div>
+        [% END %]
+        [% END %]
+            <br>
+            <div align="center">
+                <a href="?page=archive_summary" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="browse the archives">browse the archives</a>
+            </div>
+            <br>
+        </div>
+    </div>
+    <div class="box_column">
+        [% IF fe.links_by_cat('[SYS] Navigation') %]
+            <div class="box_frame">
+            <div class="shadow1">
+            <div class="box_title">Site Navigation</div>
+            <div class="box">
+                [% FOREACH link = fe.links_by_cat('[SYS] Navigation') %]
+                <a href="[% link.url %]" title="[% link.long_name %]"><div class="box_link" onMouseOver="this.style.backgroundColor='#CCCCCC'" onMouseOut="this.style.backgroundColor='transparent'">[% link.short_name %]</div></a>
+                [% END %]
+            </div>
+            </div>
+            </div>
+            <br>  
+        [% END %]
+        [% i = 0 %]
+        [% calendar = fe.draw_calendar(fe.cgi.param('calendar_month'), fe.cgi.param('calendar_year')) %]
+        <div class="box_frame">
+        <div class="shadow1">
+        <div class="box_title">
+            <a href="/?calendar_month=[% calendar.last_month %]&calendar_year=[% calendar.last_month_year %]" title="Go to previous month">&lt;&lt;</a>&nbsp;&nbsp;[% calendar.month %] [% calendar.year %]&nbsp;&nbsp;<a href="/?calendar_month=[% calendar.next_month %]&calendar_year=[% calendar.next_month_year %]" title="Go to future month">&gt;&gt;</a>
+        </div>
+        <div class="box_title">
+           <table width="100%" border="0">
+                <tr>
+                    <td align="center">
+                        <font style="font-size: 12px">Su</font>
+                    </td>
+                    <td align="center">
+                        <font style="font-size: 12px">Mo</font>
+                    </td>
+                    <td align="center">
+                        <font style="font-size: 12px">Tu</font>
+                    </td>
+                    <td align="center">
+                        <font style="font-size: 12px">We</font>
+                    </td>
+                    <td align="center">
+                        <font style="font-size: 12px">Th</font>
+                    </td>
+                    <td align="center">
+                        <font style="font-size: 12px">Fr</font>
+                    </td>
+                    <td align="center">
+                        <font style="font-size: 12px">Sa</font>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="box">
+            <table width="100%" border="0">
+                <tr>
+                   [% FOREACH day = calendar.days %]
+                        [% NEXT IF day == 1 %]
+                        [% IF day %]
+                            [% IF day.is_today %]
+                                <td align="center" style="background: #772200; color: #FFFFFF"><a style="background: #772200; color: #FFFFFF; font-size: 12px" href="javascript:pop_open_daycal('/', 'calendar_day', '[% day.day %]', '[% day.month %]', '[% day.year %]')" title="View events for [% day.month %]/[% day.day %]/[% day.year %] (Today)" onMouseOver="this.style.backgroundColor='#CCCCCC'; this.style.color='#000000';" onMouseOut="this.style.backgroundColor='#772200'; this.style.color='#FFFFFF';">[% day.single_day %]</a></td>
+                            [% ELSE %]
+                                <td align="center"><a style="font-size: 12px" href="javascript:pop_open_daycal('/', 'calendar_day', '[% day.day %]', '[% day.month %]', '[% day.year %]')" title="View events for [% day.month %]/[% day.day %]/[% day.year %]" onMouseOver="this.style.backgroundColor='#CCCCCC'" onMouseOut="this.style.backgroundColor='transparent'">[% day.single_day %]</a></td>
+                            [% END %]
+                        [% ELSE %]
+                            <td>&nbsp;&nbsp;</td>
+                        [% END %]
+
+                        [% i = i + 1 %]
+
+                        [% IF (i == 7 or i == 14 or i == 21 or i == 28) %]
+                            </tr><tr>
+                        [% ELSIF i == 35 %]
+                            </tr>
+                        [% END %]
+                    [% END %]
+                </table>
+            </div>
+        </div>
+        </div>
+        <br>
+        [% IF fe.links_by_cat('[SYS] External Links') %]
+            <div class="box_frame">
+            <div class="shadow1">
+            <div class="box_title">External Links</div>
+            <div class="box">
+                   [% FOREACH link = fe.links_by_cat('[SYS] External Links') %]
+                   <a href="[% link.url %]" title="[% link.long_name %]"><div class="box_link" onMouseOver="this.style.backgroundColor='#CCCCCC'" onMouseOut="this.style.backgroundColor='transparent'">[% link.short_name %]</div></a>
+                   [% END %]
+            </div>
+            </div>
+            </div>
+            <br>
+        [% END %]
+        <div class="box_frame">
+        <div class="shadow1">
+        <div class="box_title">Recent Referrers</div>
+        <div class="box">
+                    [% FOREACH referrer = fe.ri.last_referrers(10) %]
+                        [% IF referrer.search_engine != "none" %]
+                        <a href="[% referrer.full_href %]" title="[% referrer.query_string %] @ [% referrer.search_engine %]"><div class="box_link" onMouseOver="this.style.backgroundColor='#CCCCCC'" onMouseOut="this.style.backgroundColor='transparent'">[% referrer.search_engine %] - [% referrer.query_string %]</div></a>
+                        [% ELSE %]
+                        <a href="[% referrer.full_href %]" title="go to site [% referrer.full_href %]"><div class="box_link" onMouseOver="this.style.backgroundColor='#CCCCCC'" onMouseOut="this.style.backgroundColor='transparent'">[% referrer.tidy_href %]</div></a>
+                        [% END %]
+                    [% END %]
+        </div>
+        </div>
+        </div>
+        <br>
+            </div>
+    <script language="javascript">
+    /*
+        var req;
+        var counter = document.getElementById('counter_number').firstChild;
+
+        function loadCounter(url) {
+            // copied from apple.com's XMLHttpRequest document (sorry)
+            // branch for native XMLHttpRequest object
+            if (window.XMLHttpRequest) {
+                req = new XMLHttpRequest();
+                req.onreadystatechange = processChange;
+                req.open("GET", url, true);
+                req.send(null);
+            // branch for IE/Windows ActiveX version
+            } else if (window.ActiveXObject) {
+                req = new ActiveXObject("Microsoft.XMLHTTP");
+                if (req) {
+                    req.onreadystatechange = processChange;
+                    req.open("GET", url, true);
+                    req.send();
+                }
+            }
+            setTimeout('loadCounter("bin/counter")', 5000);
+        }
+
+        function processChange() {
+            if (req.readyState == 4) {
+                // make sure we're OK
+                if (req.status == 200) {
+                    if (counter.nodeValue != req.responseText) {
+                        counter.nodeValue = req.responseText;
+                    }
+                } else {
+                    //alert("There was a problem retrieving the counter data: \n" + req.statusText);
+                }
+            }
+        }
+
+        document.article_search.search_string.focus();
+        setTimeout('loadCounter("bin/counter")', 500);
+        loadCounter('bin/counter');
+        */
+   </script>
+    </body>
+</html>

@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+# $Id: manage_types 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# manage event types!
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'Manage Event Types',
+                tool_name           =>          'manage_types',
+                description         =>          'Manage event types used to categorize events within the system',
+                menu_position       =>          '_top, Calendar',
+                sufficient_flags    =>          ['s', 'a']
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::CalendarInterface;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates", 
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $ci = new BadNews::CalendarInterface;
+my $error = {};
+
+# get function
+my $func = $q->param('func');
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        if ($func eq "add") {
+            my $type = $q->param('add_type');
+            my $allow_overlap = $q->param('allow_overlap');
+            $allow_overlap = $allow_overlap ? $allow_overlap : '0';
+            $ci->add_event_type($type, $allow_overlap);
+            $bn->log($session->user, 'add_event_type', $type);
+        } elsif ($func eq "delete") {
+            foreach my $param ($q->Vars) {
+                next if $param eq "func" or $param eq "add_type";
+                if ($ci->delete_event_type($param)) {
+                    $bn->log($session->user, 'delete_event_type', $param);
+                }
+            }
+        }
+        print $q->header();
+        $tmpl->process('manage_types.tt2', { title     =>      'Manage Event Types',
+                                          error     =>      $error,
+                                          ci        =>      $ci,
+                                          tool_name =>      'Manage Event Types',
+                                          tool_icon =>      '../../theme_images/control_panel/04manageevent.gif' });
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

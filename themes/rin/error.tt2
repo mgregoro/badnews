@@ -1,0 +1,11 @@
+<html>
+<!-- $Id: error.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>bN error!</title>
+        <link href="[% fe.bn_location %]/style/rin.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+                Error: [% error %]
+    </body>
+</html>

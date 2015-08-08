@@ -1,0 +1,59 @@
+[% INCLUDE tool_top %]
+<!-- $Id: list_authors.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="90%" cellspacing="0" cellpadding="0" align="center">
+            <tr>
+                <td>
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="30%" class="header_text" align="left">
+                                Author Name
+                            </td>
+                            <td width="30%" class="header_text" align="left">
+                                Common Name
+                            </td>
+                            <td width="40%" class="header_text" align="left">
+                                Create Time
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% altrow = 0 %]
+            [% FOREACH author = ai.list %]
+            <tr>
+                <td class="altrow_[% altrow %]">
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="30%" class="tiny_text" align="left">
+                                [% author.username %]
+                            </td>
+                            <td width="30%" class="tiny_text" align="left">
+                                [% author.common_name %]
+                            </td>
+                            <td width="35%" class="tiny_text" align="left">
+                                [% author.create_time %]
+                            </td>
+                            <td width="5%" class="tiny_text" align="center">
+                                <a href="delete_author?id=[% author.id %]" title="delete author [% author.username %]...">[x]</a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% IF altrow == 1 %]
+                [% altrow = 0 %]
+            [% ELSE %]
+                [% altrow = 1 %]
+            [% END %]
+            [% END %]
+            <tr valign="top">
+                <td align="right">
+                    &nbsp;
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

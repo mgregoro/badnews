@@ -1,0 +1,8 @@
+[% INCLUDE header %]
+<!-- $Id: view_site.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+
+    <script language='javascript'>
+        window.open('http://[% site %]', 'http://[% site %]');
+    </script>
+
+[% INCLUDE footer %]

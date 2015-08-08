@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<badnews_config version="1.0" badnews_version="0.10">
+    <!-- testing this theme -->
+    <test>Theme configs work!</test>
+</badnews_config>

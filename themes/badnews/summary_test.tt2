@@ -1,0 +1,91 @@
+[% IF fe.cgi.param('filter_type') %]
+    [% filter_type = fe.cgi.param('filter_type') %]
+[% ELSE %]
+    [% filter_type = 'All' %]
+[% END %]
+<html>
+<!-- $Id: summary_test.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+        <title>[% fe.config.APP_WINDOW_TITLE %]</title>
+        <link href="style/badnews.css" rel="stylesheet" type="text/css">
+    </head>
+    <script language="javascript">
+        function openUrl(url) {
+            var oURL = url;
+            window.open(oURL, "comments", "width=280,height=280,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+    </script>
+    <body>
+        <form name="article_search" action="" method="POST">
+            <input type="hidden" name="page" value="search">
+            <div class="search_place">Search:&nbsp;&nbsp;<input type="text" size="24" maxlength="128" name="search_string" class="tiny_text">
+                    &nbsp;&nbsp;<input type="submit" value="Search" class="tiny_text"></div>
+        </form>
+        <form name="article_type" action="" method="post">
+        <input type="hidden" name="page" value="summary_test">
+        <div class="cat_place">Category:&nbsp;&nbsp;<select name="filter_type"  onChange="javascript:document.article_type.submit();">
+                <option selected value="[% filter_type %]">[% filter_type %]</option>
+                [% FOREACH type = fe.ai.list_non_system_categories %]
+                [% NEXT IF type == filter_type %]
+                <option value="[% type %]">[% type %]</option>
+                [% END %]
+                [% IF filter_type != "All" %]
+                <option value="All">All</option>
+                [% END %]
+            </select>&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+        </form>
+        <div class="title_place">[% fe.config.APP_TITLE %]</div>
+    <div class="overlay">whatever you want to say</div>
+    <div class="main_column">
+        [% i = 0 %]
+        [% narticle = fe.ai.count_articles_by_category(filter_type, 'create', 5) %]
+        [% FOREACH article = fe.ai.articles_by_category(filter_type, 'create', 5) %]
+        [% i = i + 1 %]
+        <div class="article_spacer"><img src="images/nothing.gif" height="6" width="1"></div>
+        <div class="article">
+            [% author = fe.author_by_name(article.author) %]
+            <div class="subject_text">
+                [% article.subject %] <font class="subject_alt">by</font> [% author.common_name %] <font class="subject_alt">@</font> [% fe.ai.pretty_date(article.create_time) %]
+            </div>
+            <p class="body_text">[% article.summary %]</p>
+            <div class="tiny_text" align="right">
+                <a href="/?page=article&article_id=[% article.id %]" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="open article '[% article.subject %]'">Read More</a>
+            </div>
+            <div class="tiny_text" align="right">
+            [% IF article.files %]
+                Files: 
+                [% FOREACH file = article.files %]
+                <a href="/files/[% file.name %]" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a> 
+                [% END %]
+                [% IF article.links %]
+                    / 
+                [% END %]
+            [% END %]
+            [% IF article.links %]
+                Links:
+                [% FOREACH link = article.links %]
+                <a href="[% link.url %]" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="[% link.long_name %]" target="_new">[% link.short_name %]</a> 
+                [% END %]
+            [% END %]
+            </div>
+        </div>
+        [% UNLESS i == narticle %]
+            [% IF article.files || article.links || article.enable_comments %]
+                <div class="article_spacer"><img src="images/nothing.gif" height="3" width="1"></div>
+            [% END %]
+            <div class="css_dotted"></div>
+        [% END %]
+        [% END %]
+            <br>
+            <div align="center">
+                <a href="?page=archive_summary" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="browse the archives">browse the archives</a>
+            </div>
+            <br>
+        </div>
+    </div>
+    <script language="javascript">
+        document.article_search.search_string.focus();
+    </script>
+    </body>
+</html>

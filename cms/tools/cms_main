@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+# $Id: cms_main 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+        tool_title          =>          'Control Center',
+        tool_name           =>          'cms_main',
+        menu_position       =>          '_none',
+        description         =>          'The new control center interface BadNews',
+        sufficient_flags    =>          ['s', 'a']
+    );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use CGI;
+use BadNews;
+use BadNews::Session;
+use BadNews::Author;
+
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>    $c->CMS_PATH . "/templates", 
+                        PRE_PROCESS    =>      [qw(header.tt2 footer.tt2)],
+                        TRIM           =>      1});
+
+my $q = new CGI;
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id  =>  $session_id);
+    if ($session) {
+        my $user = $session->bnuser;
+        if ($user->has_flag('a')) {
+            print $q->header();
+            $tmpl->process('cms_main.tt2', { title     =>      $c->APP_TITLE . " Control Center",
+                                              session   =>      $session});
+        }
+        exit();
+    } else {
+        print $q->redirect('login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('login');
+    exit();
+}

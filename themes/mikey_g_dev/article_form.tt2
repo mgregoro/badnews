@@ -1,0 +1,731 @@
+    <!-- $Id: article_form.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+        <a name="[% article.id %]"></a>
+        <script name="javascript">
+        var a_[% article.id %]_c = new Array();
+
+        function expand_all_[% article.id %] () {
+            var link = document.getElementById("all_[% article.id %]_comments");
+            link.firstChild.nodeValue = '[- all]';
+            link.href = "javascript:collapse_all_[% article.id %]();";
+            link.title = "Collapse all comments for this article";
+            for (var i = 0; i < a_[% article.id %]_c.length; i++) {
+                expand(a_[% article.id %]_c[i]);
+            }
+        }
+
+        function collapse_all_[% article.id %] () {
+            var link = document.getElementById("all_[% article.id %]_comments");
+            link.firstChild.nodeValue = '[+ all]';
+            link.href = "javascript:expand_all_[% article.id %]();";
+            link.title = "Expand all comments for this article";
+            for (var i = 0; i < a_[% article.id %]_c.length; i++) {
+                collapse(a_[% article.id %]_c[i]);
+            }
+        }
+
+        </script>
+        [% IF fe.c.THREADED_COMMENTS && article.enable_comments %]
+        <div class="fixed_small" align="right">
+            <a onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" href="javascript:expand_all_[% article.id %]();" style="text-decoration: none;" id="all_[% article.id %]_comments" title="expand all comments for this article">[+ all]</a>
+        </div>
+        [% END %]
+        <div class="article_spacer"><img src="theme_images/[% fe.theme %]/nothing.gif" height="6" width="1"></div>
+        <div class="article">
+            [% author = fe.author_by_name(article.author) %]
+            <div class="subject_text">
+            <font class="subject_alt_small" style="text-transform: lowercase;">[[% article.clean_category %]]</font> [% article.subject %] <font class="subject_alt">by</font> [% author.common_name %] <font class="subject_alt">@</font> [% fe.ai.pretty_date(article.create_time) %]
+            </div>
+            <p class="body_text">[% article.body %]</p>
+            [% IF article.enable_comments %]
+                <a name="[% article.id %]_c"></a>
+                [% comment_count = article.count_comments %]
+                [% comment_i = 0 %]
+                [% IF fe.c.THREADED_COMMENTS %]
+                    <!-- threaded comments configured -->
+                    <div class="top_comment">
+                    [% FOREACH comment = article.base_comments %]
+                        <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                        <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                            [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                            [% ELSE %]
+                                [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                            [% END %]
+                                [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                    <input type="hidden" name="expanded" value="no">
+                                    <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                    <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                    <input type="hidden" name="exp" value="">
+                                    <input type="hidden" name="irt" value="[% comment.id %]">
+                                    <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                    <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                    <table width="80%">
+                                    <!-- here's that pesky form -->
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    </div>
+                                    </form>
+                                <script language="javascript">
+                                    document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                </script>
+                        <div class="comment">
+                            [% FOREACH comment = comment.dc %]
+                            <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                            <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                            [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                            [% ELSE %]
+                                [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                            [% END %]
+                                [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                    <input type="hidden" name="expanded" value="no">
+                                    <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                    <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                    <input type="hidden" name="exp" value="">
+                                    <input type="hidden" name="irt" value="[% comment.id %]">
+                                    <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                    <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                    <table width="80%">
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    </div>
+                                    </form>
+                                <script language="javascript">
+                                    document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                </script>
+                                <div class="comment">
+                                    [% FOREACH comment = comment.dc %]
+                                <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                                <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                                [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% ELSE %]
+                                    [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %]  {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% END %]
+                                    [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                    <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                    <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                        <input type="hidden" name="expanded" value="no">
+                                        <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                        <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                        <input type="hidden" name="exp" value="">
+                                        <input type="hidden" name="irt" value="[% comment.id %]">
+                                        <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                        <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                        <table width="80%">
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                        </table>
+                                        </div>
+                                        </form>
+                                    <script language="javascript">
+                                        document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                    </script>
+                                    <div class="comment">
+                                        [% FOREACH comment = comment.dc %]
+                                        <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                                <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                                [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% ELSE %]
+                                [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% END %]
+                                    [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                    <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                    <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                        <input type="hidden" name="expanded" value="no">
+                                        <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                        <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                        <input type="hidden" name="exp" value="">
+                                        <input type="hidden" name="irt" value="[% comment.id %]">
+                                        <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                        <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                        <table width="80%">
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                        </table>
+                                        </div>
+                                        </form>
+                                    <script language="javascript">
+                                        document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                    </script>
+                                    <div class="comment">
+                                        [% FOREACH comment = comment.dc %]
+                                        <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                                <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                                [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% ELSE %]
+                                [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% END %]
+                                    [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                    <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                    <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                        <input type="hidden" name="expanded" value="no">
+                                        <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                        <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                        <input type="hidden" name="exp" value="">
+                                        <input type="hidden" name="irt" value="[% comment.id %]">
+                                        <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                        <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                        <table width="80%">
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                        </table>
+                                        </div>
+                                        </form>
+                                    <script language="javascript">
+                                        document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                    </script>
+                                    <div class="comment">
+                                        [% FOREACH comment = comment.dc %]
+                                        <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                                <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                                [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% ELSE %]
+                                [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% END %]
+                                    [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                    <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                    <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                        <input type="hidden" name="expanded" value="no">
+                                        <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                        <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                        <input type="hidden" name="exp" value="">
+                                        <input type="hidden" name="irt" value="[% comment.id %]">
+                                        <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                        <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                        <table width="80%">
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                        </table>
+                                        </div>
+                                        </form>
+                                    <script language="javascript">
+                                        document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                    </script>
+                                    <div class="comment">
+                                        [% FOREACH comment = comment.dc %]
+                                        <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                                <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                                [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% ELSE %]
+                                [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% END %]
+                                    [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                    <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                    <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                        <input type="hidden" name="expanded" value="no">
+                                        <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                        <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                        <input type="hidden" name="exp" value="">
+                                        <input type="hidden" name="irt" value="[% comment.id %]">
+                                        <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                        <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                        <table width="80%">
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                        </table>
+                                        </div>
+                                        </form>
+                                    <script language="javascript">
+                                        document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                    </script>
+                                    <div class="comment">
+                                    [% FOREACH comment = comment.dc %]
+                                        <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                                <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                                [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% ELSE %]
+                                [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% END %]
+                                    [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                    <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                    <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                        <input type="hidden" name="expanded" value="no">
+                                        <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                        <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                        <input type="hidden" name="exp" value="">
+                                        <input type="hidden" name="irt" value="[% comment.id %]">
+                                        <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                        <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                        <table width="80%">
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                        </table>
+                                        </div>
+                                        </form>
+                                    <script language="javascript">
+                                        document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                    </script>
+                                    <div class="comment">
+                                    [% FOREACH comment = comment.dc %]
+                                        <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                                <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                                [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% ELSE %]
+                                [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% END %]
+                                    [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                    <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                    <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                        <input type="hidden" name="expanded" value="no">
+                                        <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                        <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                        <input type="hidden" name="exp" value="">
+                                        <input type="hidden" name="irt" value="[% comment.id %]">
+                                        <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                        <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                        <table width="80%">
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                        </table>
+                                        </div>
+                                        </form>
+                                    <script language="javascript">
+                                        document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                    </script>
+                                    <div class="comment">
+                                    [% FOREACH comment = comment.children %]
+                                        <script language="javascript">a_[% article.id %]_c.push([% comment.id %]);</script>
+                                <a id="l[% comment.id %]" class="fixed_text" href="javascript:expand([% comment.id %])" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" style="text-decoration: none;" title="Expand comment">[+]</a>&nbsp;<b>Comment</b> ([% comment.subject %]) by 
+                                [% IF comment.url %]
+                                <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% ELSE %]
+                                [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<span id = "c[% comment.id %]"><br>
+                                [% END %]
+                                    [% comment.comment %]<br><script language="javascript">document.getElementById('c[% comment.id %]').style.display = 'none';</script>
+                                    <a href="javascript:commentForm('[% article.id %]_irt_[% comment.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_irt_[% comment.id %]_link">[reply]</a>
+                                    <form name="leave_comment_[% article.id %]_irt_[% comment.id %]" action="" method="POST">
+                                        <input type="hidden" name="expanded" value="no">
+                                        <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                                        <input type="hidden" name="page" value="[% fe.param('page') %]">
+                                        <input type="hidden" name="exp" value="">
+                                        <input type="hidden" name="irt" value="[% comment.id %]">
+                                        <input type="hidden" name="c_article_id" value="[% article.id %]">
+                                        <div id="comment_form_[% article.id %]_irt_[% comment.id %]" class="tiny_text">
+                                        <table width="80%">
+                                        <tr valign="top">
+                                            <td width="50%">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td align="left" width="10%" class="tiny_text">Name:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                                    <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                                    <td align="left" width="10%" class="tiny_text">Url:</td>
+                                                    <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                                                </tr>
+                                                <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                                            </table>
+                                            </td>
+                                            <td width="50%" align="left">
+                                            <table width="100%">
+                                                <tr valign="top">
+                                                    <td width="10%" align="right" class="tiny_text">
+                                                        C:
+                                                    </td>
+                                                    <td width="90%">
+                                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" align="right">
+                                            <input type="button" value="Leave Comment" name="submit_form" onClick="javascript:submitForm('leave_comment_[% article.id %]_irt_[% comment.id %]')" class="tiny_text">
+                                            </td>
+                                        </tr>
+                                        </table>
+                                        </div>
+                                        </span>
+                                        </form>
+                                    <script language="javascript">
+                                        document.getElementById('comment_form_[% article.id %]_irt_[% comment.id %]').style.display="none";
+                                    </script>
+                                        [% END %]
+                                    </div></span>
+                                    <br>
+                                        [% END %]
+                                    </div></span>
+                                    <br>
+                                        [% END %]
+                                    </div></span>
+                                    <br>
+                                        [% END %]
+                                    </div></span>
+                                    <br>
+                                        [% END %]
+                                    </div></span>
+                                    <br>
+                                        [% END %]
+                                    </div></span>
+                                    <br>
+                                        [% END %]
+                                    </div></span>
+                                    <br>
+                                    [% END %]
+                                </div></span>
+                                <br>
+                            [% END %]
+                            </div></span>
+                            <br>
+                    [% END %]
+                    </div>
+
+                [% ELSE %]
+
+                    [% FOREACH comment = article.comments %]
+                        [% comment_i = comment_i + 1 %]
+                        <div class="comment">
+                            <b>Comment</b> by 
+                            [% IF comment.url %]
+                            <a href="[% comment.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<br><br>
+                            [% ELSE %]
+                            [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %] {[% comment.count_children %]}<br><br>
+                            [% END %]
+                                [% comment.comment %]
+                        </div>
+                        [% UNLESS comment_i == comment_count %]
+                            <div class="comment_spacer"></div>
+                        [% END %]
+                    [% END %]
+
+                [% END %]
+                <br>
+            <form name="leave_comment_[% article.id %]" action="" method="POST">
+                <input type="hidden" name="expanded" value="no">
+                <input type="hidden" name="search_string" value = "[% fe.param('search_string') %]">
+                <input type="hidden" name="page" value="[% fe.param('page') %]">
+                <input type="hidden" name="exp" value="">
+                <input type="hidden" name="c_article_id" value="[% article.id %]">
+                <div id="comment_form_[% article.id %]" class="tiny_text">
+                <table width="100%">
+                    <tr valign="top">
+                       <td width="50%">
+                            <table width="100%">
+                            <tr valign="top">
+                                <td align="left" width="10%" class="tiny_text">Name:</td>
+                                <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="name" class="tiny_text"></td>
+                                <td align="left" width="10%" class="tiny_text">&nbsp;</td>
+                                <td align="left" width="10%" class="tiny_text">Url:</td>
+                                <td align="left" width="35%" class="tiny_text"><input type="text" size="18" maxlength="128" name="url" class="tiny_text"></td>
+                            </tr>
+                            <tr><td colspan="1" align="left" class="tiny_text">Subject:</td><td colspan="4" class="tiny_text"><input type="text" size="32" maxlength="128" name="subject" class="tiny_text"></td></tr>
+                            </table>
+                            </td>
+                            <td width="50%" align="left">
+                            <table width="100%">
+                            <tr valign="top">
+                                    <td width="10%" align="right" class="tiny_text">
+                                        C:
+                                    </td>
+                                    <td width="90%">
+                                        <textarea name="comment" wrap="virtual" rows="3" cols="20" class="tiny_text"></textarea>
+                                    </td>
+                            </tr>
+                            </table>
+                            </td>
+                    </tr>
+                </table>
+                <div class="tiny_text" align="right">
+                    <input type="submit" value="Leave Comment" name="submit" class="tiny_text">
+                </div>
+                </div>
+           </form>
+           <script language="javascript">
+                document.getElementById('comment_form_[% article.id %]').style.display="none";
+            </script>
+            <div class="tiny_text" align="right">
+                <a href="javascript:commentForm('[% article.id %]')" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" id="comment_form_[% article.id %]_link">[comment]</a>
+            </div>
+            [% END %]
+            <div class="tiny_text" align="right">
+            [% IF article.files %]
+                Files: 
+                [% FOREACH file = article.files %]
+                <a href="/files/[% file.name %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a> 
+                [% END %]
+                [% IF article.links %]
+                    / 
+                [% END %]
+            [% END %]
+            [% IF article.links %]
+                Links:
+                [% FOREACH link = article.links %]
+                <a href="[% link.url %]" onMouseOver="this.style.color='[% fe.tc.AC_COLOR1 %]'" onMouseOut="this.style.color='[% fe.tc.FG_COLOR %]'" title="[% link.long_name %]" target="_new">[% link.short_name %]</a> 
+                [% END %]
+            [% END %]
+            </div>
+        </div>

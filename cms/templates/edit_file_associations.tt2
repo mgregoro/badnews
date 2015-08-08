@@ -1,0 +1,24 @@
+[% INCLUDE tool_top %]
+<!-- $Id: edit_file_associations.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr>
+    <td>
+        <table width="100%" height="100%" cellspacing="0" cellpadding="0">
+            <tr height="33%">
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="180" width="1">
+                </td>
+            </tr>
+            <tr height="33%">
+                <td class="normal_text" align="center">
+                    Under Construction
+                </td>
+            </tr>
+            <tr height="33%">
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

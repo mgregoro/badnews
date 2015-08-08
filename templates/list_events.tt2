@@ -1,0 +1,117 @@
+[% INCLUDE tool_top %]
+<!-- $Id: list_events.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="90%" cellspacing="0" cellpadding="0" align="center">
+            <tr>
+                <td>
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td colspan="6">
+                                <img src="/images/nothing.gif" height="15" width="1">
+                            </td>
+                        <tr>
+                            <td colspan="6" align="right" class="normal_text">
+                                <table width="100%" cellspacing="0" cellpadding="0" align="right">
+                                    <tr>
+                                        <td width="45%">
+                                            <img src="/images/nothing.gif" height="1" width="1">
+                                        </td>
+                                        <td width="32%" class="normal_text" align="right">
+                                            Filter By Event Type:
+                                        </td>
+                                        <td width="3%">
+                                            <img src="/images/nothing.gif" height="1" width="15">
+                                        </td>
+                                        <td width="20%">
+                                            <form name="event_type" action="list_events" method="get">
+                                                <select name="filter_type" onChange="javascript:document.event_type.submit();">
+                                                    <option selected value="[% filter_type %]">[% filter_type %]</option>
+                                                    [% FOREACH type = ci.list_event_types %]
+                                                    [% NEXT IF type == filter_type %]
+                                                    <option value="[% type %]">[% type %]</option>
+                                                    [% END %]
+                                                    [% IF filter_type != "All" %]
+                                                        <option value="All">All</option>
+                                                    [% END %]
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6">
+                                            <img src="/images/nothing.gif" height="15" width="1">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="20%" class="header_text">
+                                Start Time
+                            </td>
+                            <td width="20%" class="header_text">
+                                End Time
+                            </td>
+                            <td width="15%" class="header_text">
+                                Type
+                            </td>
+                            <td width="10%" class="header_text">
+                                Place
+                            </td>
+                            <td width="25%" class="header_text">
+                                Summary
+                            </td>
+                            <td width="10%" class="header_text">
+                                &nbsp;
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% altrow = 0 %]
+            [% FOREACH event = ci.events_by_type(filter_type) %]
+            <tr>
+                <td class="altrow_[% altrow %]">
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td class="altrow_[% altrow %]" width="20%">
+                                [% event.start_time_short %]
+                            </td>
+                            <td class="altrow_[% altrow %]" width="20%">
+                                [% event.end_time_short %]
+                            </td>
+                            <td class="altrow_[% altrow %]" width="15%">
+                                [% event.type %]
+                            </td>
+                            <td class="altrow_[% altrow %]" width="10%">
+                                [% event.place %]
+                            </td>
+                            <td class="altrow_[% altrow %]" width="25%">
+                                [% event.summary %]
+                            </td>
+                            <td class="altrow_[% altrow %]" width="5%">
+                                <a class="normal_text" title="edit event: '[% event.summary %]'" href="edit_event?id=[% event.id %]">[e]</a>
+                            </td>
+                            <td class="altrow_[% altrow%]" width="5%">
+                                <a class="normal_text" title="delete event: '[% event.summary %]'" href="edit_event?id=[% event.id %]&delete=1">[x]</a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% IF altrow == 1 %]
+                [% altrow = 0 %]
+            [% ELSE %]
+                [% altrow = 1 %]
+            [% END %]
+            [% END %]
+            <tr valign="top">
+                <td align="right">
+                    &nbsp;
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

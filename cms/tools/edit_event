@@ -1,0 +1,268 @@
+#!/usr/bin/perl
+# $Id: edit_event 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# edit event
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'Edit An Event',
+                tool_name           =>          'edit_event',
+                description         =>          'Edit an existing event',
+                menu_position       =>          '_none',
+                sufficient_flags    =>          ['s', 'a']
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}  
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::CalendarInterface;
+use BadNews::Calendar::Event;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $ci = BadNews::CalendarInterface->new();
+my $error = {};
+
+my $session_id = $q->cookie('bnauth');
+my $event_id = $q->param('id');
+
+# pull the from date
+my $fm = $q->param('from_month');
+my $fd = $q->param('from_day');
+my $fy = $q->param('from_year');
+my $fh = $q->param('from_hour');
+my $fmin = $q->param('from_minute');
+my $fampm = $q->param('from_ampm');
+
+# pull the to date
+my $tm = $q->param('to_month');
+my $td = $q->param('to_day');
+my $ty = $q->param('to_year');
+my $th = $q->param('to_hour');
+my $tmin = $q->param('to_minute');
+my $tampm = $q->param('to_ampm');
+
+# pull the other info
+my $place = $q->param('place');
+my $type = $q->param('type');
+my $description = $q->param('description');
+my $summary = $q->param('short_description');
+my $show_event = $q->param('show_event');
+my $delete = $q->param('delete');
+my $confirm = $q->param('confirm');
+
+# recurring stuff
+my $recur_qty = $q->param('recur_qty');
+my $recur_type = $q->param('recur_type');
+my $recur_interval;
+my $recurring_event;
+
+my $rm = $q->param('recur_month');
+my $rd = $q->param('recur_day');
+my $ry = $q->param('recur_year');
+my $rh = $q->param('recur_hour');
+my $rmin = $q->param('recur_minute');
+my $rampm = $q->param('recur_ampm');
+
+# if the recur quantity is a number..
+if ($recur_qty =~ /^\d+$/o && $recur_qty > 0) {
+    # and there's a recur type
+    if ($recur_type) {
+        # form the recur interval
+        $recur_interval = $recur_qty . substr($recur_type, 0, 1);
+
+        # set the recurring_event flag to a true value
+        $recurring_event = 1;
+    } else {
+        $recurring_event = 0;
+    }
+} elsif ($recur_qty >= 0) {
+    $recurring_event = 0;
+}
+
+# may as well resolve them
+my $from_ez = $ci->funk_to_ezdate("$fm/$fd/$fy $fh:$fmin:00 $fampm") if $fy;
+my $to_ez = $ci->funk_to_ezdate("$tm/$td/$ty $th:$tmin:00 $tampm") if $ty;
+my $recur_ez = ($ry and $recurring_event) ? $ci->funk_to_ezdate("$rm/$rd/$ry $rh:$rmin:00 $rampm") : 0;
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        if (my $event = BadNews::Calendar::Event->open($event_id)) {
+            if ($delete) {
+                if ($confirm) {
+                    my $id = $event->id;
+                    my $description = $event->description;
+                    $event->delete;
+                    $bn->log($session->user, 'delete_event', $description);
+                    print $q->header();
+                    $tmpl->process('t_message.tt2',     {   title       =>      "Event $id deleted successfully!",
+                                                            error       =>      $error,
+                                                            tool_name   =>      'Edit An Event',
+                                                            tool_icon   =>      '../../theme_images/control_panel/03editevent.gif',
+                                                            back_to     =>      'list_events',
+                                                            message     =>      "Event $id has been permanently removed from the event database."});
+                } else {
+                    print $q->header();
+                    $tmpl->process('t_prompt.tt2',      {   title       =>      'Delete Event Confirm',
+                                                            error       =>      $error,
+                                                            tool_name   =>      'Edit An Event',
+                                                            no_url      =>      'javascript:window.close();',
+                                                            yes_url     =>      'edit_event?id=' . $event->id . '&delete=1&confirm=1',
+                                                            tool_icon   =>      '../../theme_images/control_panel/03editevent.gif',
+                                                            question    =>      'Are you sure you want to delete Event ID: ' . $event->id . '?'});
+                }
+                exit();
+            }
+            if ($fy && $ty) {
+                if ($to_ez > $from_ez) {
+                    $event->start_time("$from_ez");
+                    $event->end_time("$to_ez");
+                    $event->place($place);
+                    $event->type($type);
+                    $event->description($description);
+                    $event->summary($summary);
+                    $event->show_event($show_event);
+                    $event->recur_interval($recur_interval);
+                    $event->recurring_event($recurring_event);
+                    $event->recur_until("$recur_ez");
+                    #$event->coordinator($session->user);
+
+                    # this is where we check for conflicts here
+                    my $conflicting_events;
+                    my @event_objects;
+                    my $conflicts = 0;
+
+                    my @projected_dates;
+
+                    if ($recurring_event) {
+                        @projected_dates = $ci->project_recur_dates($event);
+                        $event->{projected_dates} = \@projected_dates;
+                    }
+
+                    if (!$ci->type_allows_overlap($event->type)) {
+                        my @events = $ci->check_overlap_by_type($event->start_time, $event->type, $recurring_event);
+                        foreach my $projected_date (@projected_dates) {
+                            push(@events, $ci->check_overlap_by_type($projected_date->{start_time}, $event->type, $recurring_event));
+                        }
+                        foreach my $evnt (@events) {
+                            if (ref($evnt) eq "BadNews::Calendar::Event") {
+                                my ($root_event_id) = $evnt->id =~ /^(\d+).*$/o;
+                                next if $root_event_id == $event->id;
+                                unless (exists($conflicting_events->{$evnt->id})) {
+                                    push(@event_objects, $evnt);
+                                }
+                                ++$conflicting_events->{$evnt->id};
+                                ++$conflicts;
+                            }
+                        }
+                    }
+                    if (!$ci->place_allows_overlap($event->place)) {
+                        my @events = $ci->check_overlap_by_place($event->start_time, $event->place, $recurring_event);
+                        foreach my $projected_date (@projected_dates) {
+                            push(@events, $ci->check_overlap_by_place($projected_date->{start_time}, $event->place, $recurring_event));
+                        }
+                        foreach my $evnt (@events) {
+                            if (ref($evnt) eq "BadNews::Calendar::Event") {
+                                my ($root_event_id) = $evnt->id =~ /^(\d+).*$/o;
+                                next if $root_event_id == $event->id;
+                                unless (exists($conflicting_events->{$evnt->id})) {
+                                    push(@event_objects, $evnt);
+                                }
+                                ++$conflicting_events->{$evnt->id};
+                                ++$conflicts;
+                            }
+                        }
+                    }
+
+                    if ($conflicts) {
+                        # we did!
+                        print $q->header();
+                        $tmpl->process('event_conflicts.tt2', {
+                            title        =>      'Conflicts Found!!',
+                            error        =>      $error,
+                            tool_name    =>      'Add An Event',
+                            event        =>      \%event,
+                            tool_icon    =>      '../../theme_images/control_panel/01addevent.gif',
+                            conflicting_events  =>  \@event_objects,
+                        }) or print "$@<BR>\n";
+                        exit();
+                    } else {
+                        $event->save;
+                        $bn->log($session->user, 'edit_event', $event->description);
+                        print $q->header();
+                        $tmpl->process('edit_event2.tt2',   { title     =>      'Event Successfully Updated!',
+                        error     =>      $error,
+                        tool_name =>      'Edit An Event',
+                        event     =>      $event,
+                        tool_icon =>      '../../theme_images/control_panel/03editevent.gif'});
+                    }
+                } else {
+                    # bad reprint w/ error
+                    $error->{event} = "Impossible date configuration.";
+                    print $q->header();
+                    $tmpl->process('edit_event.tt2', { title     =>      'Edit An Event',
+                                                      error     =>      $error,
+                                                      event     =>      $event,
+                                                      ci        =>      $ci,
+                                                      tool_name =>      'Edit An Event',
+                                                      tool_icon =>      '../../theme_images/control_panel/03editevent.gif' });
+                }
+                exit();
+            } else {
+                $ci->switch_date($event->start_time);
+                print $q->header();
+                $tmpl->process('edit_event.tt2', { title     =>      'Edit An Event',
+                                                  error     =>      $error,
+                                                  event     =>      $event,
+                                                  ci        =>      $ci,
+                                                  tool_name =>      'Edit An Event',
+                                                  tool_icon =>      '../../theme_images/control_panel/03editevent.gif' }) or
+                    $tmpl->process('t_message.tt2',     {   title       =>      "Event $id deleted successfully!",
+                                                            error       =>      $error,
+                                                            tool_name   =>      'Edit An Event',
+                                                            tool_icon   =>      '../../theme_images/control_panel/03editevent.gif',
+                                                            back_to     =>      'list_events',
+                                                            message     =>      "tt2 error: $!, $@"});
+            }
+        } else {
+            print $q->header();
+            $tmpl->process('t_generic.tt2', { title     =>      'Edit An Event',
+                                              prompt    =>      'Please enter the event id:',
+                                              fetch     =>      'id',
+                                              action    =>      'edit_event',
+                                              error     =>      $error,
+                                              tool_name =>      'Edit An Event',
+                                              tool_icon =>      '../../theme_images/control_panel/03editevent.gif' });
+        }
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

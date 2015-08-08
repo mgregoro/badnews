@@ -1,0 +1,28 @@
+[% BLOCK icon_frame %]
+    <style type="text/css">
+        div.icon_frame {
+            background: transparent url([% fe.bn_location %]/theme_images/[% fe.theme %]/icon_frame_rin.png) no-repeat;
+            width: 26px;
+            height: 25px;
+            text-align: center;
+        }
+        div.icon_bg {
+            background-color: [% fe.tc.ICON_FRAME_BG_COLOR %];
+            margin-top: 5px;
+            margin-left: 5px;
+            float: left;
+            width: 26px;
+            height: 25px;
+            text-align: center;
+        }
+        img.icon {
+            margin-top: 5px;
+            margin-left: 3px;
+        }
+    </style>
+    <div class="icon_bg" onMouseOver="this.style.background='[% fe.tc.ICON_FRAME_HOVER_COLOR %]'" onMouseOut="this.style.background='[% fe.tc.ICON_FRAME_BG_COLOR %]'">
+        <div class="icon_frame">
+            <a title="tag [% article.subject %]" href="javascript:show_add_tag('[% article.id %]')" border="0"><img class="icon" border="0" src="[% fe.bn_location %]/theme_images/[% fe.theme %]/tag_blue_add.png"></a>
+        </div>
+    </div>
+[% END %]

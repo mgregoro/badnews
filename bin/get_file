@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+# $Id: get_file 428 2006-08-30 02:00:57Z corrupt $
+
+use lib('../../lib');
+
+use CGI;
+use BadNews::File;
+
+my $q = new CGI;
+
+if ($q->param('file_id')) {
+    my $file = BadNews::File->open_by_id($q->param('file_id'));
+    if ($file) {
+        if ($q->param('dl')) {
+            print $q->header(  -type                =>  $file->media_type,
+                               -content_length      =>  $file->size,
+                               -expires             =>  '+1w',
+                               -attachment          =>  $file->name); 
+        } else {
+            print $q->header();
+            print $q->header ( -type                =>  $file->media_type,
+                               -expires             =>  '+1w',
+                               -content_length      =>  $file->size);
+        }
+        print $file->data;
+    } else {
+        print $q->header();
+        print "File does not exist.\n";
+    }
+} elsif ($q->param('file_name')) {
+    my $file = BadNews::File->open($q->param('file_name'));
+    if ($file) {
+        if ($q->param('dl')) {
+            print $q->header(  -type                =>  $file->media_type,
+                               -content_length      =>  $file->size,
+                               -expires             =>  '+1w',
+                               -attachment          =>  $file->name);
+        } else {
+            print $q->header ( -type                =>  $file->media_type,
+                               -expires             =>  '+1w',
+                               -content_length      =>  $file->size);
+        }
+        print $file->data;
+    } else {
+        print $q->header();
+        print "File does not exist.\n";
+    }
+} else {
+    print $q->header();
+    print "ERROR.\n";
+}

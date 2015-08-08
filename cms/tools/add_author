@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+# $Id: add_author 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# add an author
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+        tool_title          =>          'Add An Author',
+        tool_name           =>          'add_author',
+        description         =>          'Add a user with author privileges',
+        menu_position       =>          '_top, Authors',
+        sufficient_flags    =>          ['s']
+    );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::Author;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+
+my $tmpl = Template->new({INCLUDE_PATH   =>      $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $error = { add_author    =>      '&nbsp;'};
+
+my $common_name = $q->param('common_name');
+my $username = $q->param('username');
+my $can_publish = $q->param('can_publish');
+my $p1 = $q->param('pass1');
+my $p2 = $q->param('pass2');
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        my $autho = $session->bnuser;
+        unless ($autho->has_flag('a')) {
+            print $q->header();
+            $tmpl->process('t_message.tt2', {   title           =>          'Access Denied',
+                                                self            =>          'add_author',
+                                                message         =>          'Author: ' . $session->user . ' does not have the privileges required to access this tool.',
+                                                tool_name       =>          'Add An Author - Access Denied',
+                                                tool_icon       =>          '../../theme_images/control_panel/01addauthor.gif'});
+            exit();
+        }
+        if ($username && $p1 && $p2) {
+            if ($p1 eq $p2) {
+                my $author = BadNews::Author->new(  username        =>      $username,
+                                                    password        =>      $p1,
+                                                    common_name     =>      $common_name );
+
+                # give up the author flag
+                $author->add_flag('a');
+
+                # if they can publish, give them the publisher flag
+                if ($can_publish) {
+                    $author->add_flag('p');
+                }
+
+                if (ref($author) eq "BadNews::Author") {
+                    print $q->header();
+                    $tmpl->process('t_message.tt2', {   title       =>      'Add An Author',
+                                                        error       =>      $error,
+                                                        self        =>      'add_author',
+                                                        message     =>      'Author ' . $author->username . ' added successfully',
+                                                        tool_name   =>      'Add An Author',
+                                                        tool_icon   =>      '../../theme_images/control_panel/01addauthor.gif'});
+                    $bn->log($session->user, 'add_author', $username);
+                    exit();
+                } else {
+                    $error->{add_author} = $author;
+                }
+            } else {
+                $error->{add_author} = "Passwords did not match!";
+            }
+        }
+        print $q->header();
+        $tmpl->process('add_author.tt2', { title     =>      'Add An Author',
+                                          error     =>      $error,
+                                          self      =>      'add_author',
+                                          tool_name =>      'Add An Author',
+                                          tool_icon =>      '../../theme_images/control_panel/01addauthor.gif' });
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

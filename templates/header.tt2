@@ -1,0 +1,10 @@
+[% BLOCK header %]
+<!-- $Id: header.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<html>
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>[% title %]</title>
+        <link href="../../control_panel.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+[% END %]

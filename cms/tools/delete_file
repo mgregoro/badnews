@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+# $Id: delete_file 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# delete file
+#
+
+use vars qw($this_tool);
+ 
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+        tool_title          =>          'Delete A File',
+        tool_name           =>          'delete_file',
+        description         =>          'Delete a file from the BadNews content management system',
+        menu_position       =>          '_none',
+        sufficient_flags    =>          ['s', 'a']
+    );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use CGI;
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::File;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates", 
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $error = {};
+my $id = $q->param('id');
+my $confirm = $q->param('confirm');
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        my $file = BadNews::File->open_by_id($id);
+        if ($file) {
+            if ($confirm) {
+                my $fn = $file->name;
+                $file->delete;
+                $bn->log($session->user, 'delete_file', $fn);
+                print $q->header();
+                $tmpl->process('t_message.tt2', {   title       =>      "File $fn deleted successfully!",
+                                                    error       =>      $error,
+                                                    tool_name   =>      'Delete A File',
+                                                    tool_icon   =>      '../../theme_images/control_panel/03deletefile.gif',
+                                                    message     =>      "File $fn has been permanently removed from the file database." });
+            } else {
+                print $q->header();
+                $tmpl->process('t_prompt.tt2',  {   title       =>      'Delete File Confirm',
+                                                    error       =>      $error,
+                                                    tool_name   =>      'Delete A File',
+                                                    no_url      =>      'javascript:window.close();',
+                                                    yes_url     =>      'delete_file?id=' . $file->id . '&confirm=1',
+                                                    tool_icon   =>      '../../theme_images/control_panel/03deletefile.gif',
+                                                    question    =>      'Are you sure you want to remove the file: ' . $file->name . '?'});
+            }
+        } else {
+            print $q->header();
+            $tmpl->process('t_generic.tt2', {       title       =>      'Delete A File',
+                                                    prompt      =>      'Please enter the file id:',
+                                                    fetch       =>      'id',
+                                                    action      =>      'delete_file',
+                                                    error       =>      $error,
+                                                    tool_name   =>      'Delete A File',
+                                                    tool_icon   =>      '../../theme_images/control_panel/03deletefile.gif' });
+        }
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

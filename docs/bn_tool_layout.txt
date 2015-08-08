@@ -1,0 +1,50 @@
+this is the draft draft draft document for the tool layout of the bN
+content management system.
+
+for a tool named "example_tool":
+
+a file compressed with .zip that contains the following:
+example_tool <- the tool
+example_tool.tt2 <- the template file (all templates should go in here)
+example_tool.init <- an initialization script, makes tables for
+instance, run only once
+example_tool.start <- script to run on tool registration, run on every
+registration
+
+the tool directory structure will look like this
+badnews/toolshed <- where the tool packages are kept
+badnews/toolshed/md5 <- where package md5sums are kept
+badnews/toolshed/init <- where initialization output is kept
+badnews/cms/tools <- where the uncompressed tools are kept
+badnews/cms/templates <- where the uncompressed templates are kept
+
+this file may have the format example_tool.bnt or example_tool.zip or
+example_tool.bN or example_tool.bn
+
+the logic will look like this:
+go through 'toolshed' directory looking for new or updated tools, comparing
+them to the tools installed (using md5hex)
+
+if a tool is found to be different or new, a new md5 hash of that tool's
+compressed file is created and stored in the md5/ directory as
+example_tool.md5
+
+then the file is uncompressed.  if this is a NEW file, the
+example_tool.init script is run, otherwise then the example_tool.start
+script is run.  then the file example_tool is copied to 'tools', and
+example_file.tt2 is copied to 'templates'.
+
+if a tool is removed from the toolshed, it will be deleted and cleaned
+up from the registry.
+
+Benefits:
+
+the tool subsystem should be able to construct the table structure
+automatically using this environment
+
+tools are easier to manage, they're single files that do the right thing
+with themselves.
+
+this tool subsystem can work in future mg2/wayne state frameworks
+
+

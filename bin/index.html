@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+# $Id: index.html 428 2006-08-30 02:00:57Z corrupt $
+
+use lib('../lib');
+use CGI;
+use Time::HiRes;
+use BadNews;
+use BadNews::Referrer;
+use BadNews::Session;
+use BadNews::FrontEnd;
+
+my $bn = new BadNews;
+my $q = new CGI;
+my ($fe, $anon_session, $user_session, $cookie);
+my $start_time = Time::HiRes::time();
+
+# take note of the referrer
+if ($bn->c->COLLECT_REFERRERS) {
+    if ($ENV{HTTP_REFERER} && ($ENV{HTTP_REFERER} !~ /$ENV{SERVER_NAME}/)) {
+        BadNews::Referrer->new(full_href        =>          $ENV{HTTP_REFERER});
+    }
+}
+
+my $page = $q->param('page');
+my $theme = $q->param('theme');
+my $sticky_theme = $q->param('sticky_theme');
+
+# should always have an anonymous session
+if ($q->cookie('bnanon')) {
+    $anon_session = BadNews::Session->new(session_id     =>      $q->cookie('bnanon'));
+    if ($anon_session) {
+        $anon_session->from_cookie(1);
+    } else {
+        $anon_session = BadNews::Session->new(Anon => 1);
+        $cookie = $q->cookie(   -name=>     'bnanon',
+                                -value=>    $anon_session->session_id,
+                                -path=>     '/',
+                                -domain=>   $bn->c->COOKIE_DOMAIN );
+    }
+} else {
+    $anon_session = BadNews::Session->new(Anon  =>  1);
+    $cookie = $q->cookie(   -name=>     'bnanon',
+                            -value=>    $anon_session->session_id,
+                            -path=>     '/',
+                            -domain=>   $bn->c->COOKIE_DOMAIN );
+}
+
+# once we know we have one.. lets make sure this is updated
+$anon_session->ip_address($ENV{REMOTE_ADDR});
+$anon_session->page_count($anon_session->page_count + 1);
+
+if ($q->cookie('bnauth')) {
+    $user_session = BadNews::Session->new(session_id    =>      $q->cookie('bnauth'));
+    if ($user_session) {
+        $user_session->ip_address($ENV{REMOTE_ADDR});
+        $user_session->page_count($user_session->page_count + 1);
+        $user_session->from_cookie(1);
+    }
+}
+
+if ($theme) {
+    $fe = BadNews::FrontEnd->new( start_time => $start_time, anon_session  =>  $anon_session, user_session => $user_session, cgi =>  $q, instance => $ENV{SERVER_NAME}, theme => $theme, config => $bn->user_config);
+    if ($sticky_theme) {
+        if (ref($user_session) eq "BadNews::Session") {
+            $user_session->theme($theme);
+        } 
+        if (ref($anon_session) eq "BadNews::Session") {
+            $anon_session->theme($theme);
+        }
+    }
+} elsif (ref($anon_session) eq "BadNews::Session") {
+    if ($anon_session->theme) {
+        $fe = BadNews::FrontEnd->new( start_time => $start_time, anon_session  =>  $anon_session, user_session => $user_session, cgi =>  $q, instance => $ENV{SERVER_NAME}, theme => $anon_session->theme, config => $bn->user_config);
+    }
+} elsif (ref($user_session) eq "BadNews::Session") {
+    if ($user_session->theme) {
+        $fe = BadNews::FrontEnd->new( start_time => $start_time, anon_session  =>  $anon_session, user_session => $user_session, cgi =>  $q, instance => $ENV{SERVER_NAME}, theme => $user_session->theme, config => $bn->user_config);
+    }
+}
+
+$fe = BadNews::FrontEnd->new( start_time => $start_time, anon_session  =>  $anon_session, user_session => $user_session,cgi =>  $q, instance => $ENV{SERVER_NAME}, config => $bn->user_config) unless $fe;
+
+if ($page eq "css_stylesheet") {
+    print $q->header(-type=> 'text/css', -expires=>'+4h');
+} else {
+    if ($cookie) {
+        print $q->header(-cookie=>$cookie, -type=>'text/html', -expires=>'+15m');
+    }
+    print $q->header(-type=> 'text/html', -expires=>'+15m');
+}
+
+if ($page) {
+    $fe->render_page($page);
+} else {
+    $fe->render_page('main_page.tt2');
+}

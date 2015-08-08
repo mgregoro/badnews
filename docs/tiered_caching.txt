@@ -1,0 +1,70 @@
+Just needed to get this out of my head...
+
+once we consolidate bN into a single process, we're going to want to
+start caching things more.. and this overviewical way of how i think we
+should do that follows.
+
+Multi-key'd persistance layer.  One document can be referenced in many
+ways and have many reqirements .. for instance.. a main_page.tt2
+template might have references to date data, time data, article data,
+etc.. this might all change.  The persister needs to know what data the
+current compiled representation of main_page.tt2 represents.. the
+calendar dates, events, articles, etc.  This means possibly
+compartmentalizing main_page.tt2 into smaller blocks that may or may not
+be updated every time to include dynamic data.  Also some kind of tally
+needs to run to make sure that the time that has passed hasn't changed
+the context enough to require a re-rendering of the template.
+
+Scenario: 
+    You have an upcoming events box on your main page, and it shows the
+    events that are coming up (obviously).  An event passes and this box
+    needs to be re-rendered because its' data is no longer known to be
+    "true".
+
+Solution:
+    Have a long, pluggable w/ checks list of criteria that you can use
+    to identify the key data on a page.  When data is asked for, take
+    note of the IDs and constraints used to ask for it.  When these
+    constraints are no longer met, re-render and re-cache the page.
+
+    For instance, this cache stays "good" as long as it's not 2:30PM
+    yet, as long as article id's 943, 942, and 941 don't change, and as
+    long as no dates are added to the calendaring subsystem between
+    these dates.
+
+    How we should automatically come up with these criteria is still
+    something that needs to be cooked up..  It's better to have our
+    cache be smart and "do the right thing" rather than do something
+    like update only periodically.
+
+    something like .. 
+
+        'mikey_g/main_page.tt2' =>
+        [ 'articles.id=943', 'articles.id=942', 'articles.id=941', 
+          'system.time > 20060107143000', 
+          'events.blackout 20060107143000 <=> 2006107184500'
+        ]
+
+    might do the trick.. some kind of easily parsable markup that lets
+    us throw constraints on data inserts / changes that will flag
+    certain pages as needing to be re-rendered.. when a page is called
+    it will first check for a 'valid' cache of the pre-rendered page.
+    When it does this, it will pass the theme information and the
+    template name.  This will initiate a search of all of the
+    constraints on using the current cache and check that they still are
+    met.  If they are, it will retrieve the cache and return it.  If
+    they aren't, the template will be re-rendered and the cache will be
+    re-created and so will the criteria for 'validity' be updated.
+
+Cache Structure
+
+Data Level Cache
+        \
+         Possibly one level of data caching below this.. for logical
+         representations of data.. complicated logical representations.
+            \
+             Theme / Context
+                \
+                 Rendered Cache
+
+

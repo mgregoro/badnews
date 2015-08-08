@@ -1,0 +1,74 @@
+[% INCLUDE tool_top %]
+<!-- $Id: list_files.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="90%" cellspacing="0" cellpadding="0" align="center">
+            <tr>
+                <td>
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="22%" class="header_text" align="left">
+                                File Name
+                            </td>
+                            <td width="25%" class="header_text" align="left">
+                                Date Added
+                            </td>
+                            <td width="10%" class="header_text" align="left">
+                                Size
+                            </td>
+                            <td width="15%" class="header_text" align="left">
+                                File Type
+                            </td>
+                            <td width="28%" class="header_text" align="left">
+                                Description
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% altrow = 0 %]
+            [% FOREACH file = search.results %]
+            <tr>
+                <td class="altrow_[% altrow %]">
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="22%" class="tiny_text" align="left">
+                                <a href="/files/[% file.name %]">[% file.name_short %]</a>
+                            </td>
+                            <td width="25%" class="tiny_text" align="left">
+                                [% file.added_date %]
+                            </td>
+                            <td width="10%" class="tiny_text" align="left">
+                                [% file.size %]
+                            </td>
+                            <td width="15%" class="tiny_text" align="left">
+                                [% file.file_type %]
+                            </td>
+                            <td width="22%" class="tiny_text" align="left">
+                                [% file.description %]
+                            </td>
+                            <td width="3%" class="tiny_text" align="right">
+                                <a href="delete_file?id=[% file.id %]" title="delete file [% file.name %]...">[x]</a>
+                            </td>
+                            <td width="3%" class="tiny_text" align="right">
+                                <a href="/bin/get_file?file_id=[% file.id %]&dl=1" title="download file [% file.name %]...">[dl]</a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% IF altrow == 1 %]
+                [% altrow = 0 %]
+            [% ELSE %]
+                [% altrow = 1 %]
+            [% END %]
+            [% END %]
+            <tr valign="top">
+                <td align="right">
+                    &nbsp;
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

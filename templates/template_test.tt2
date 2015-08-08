@@ -1,0 +1,11 @@
+[% INCLUDE header %]
+<!-- $Id: template_test.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+
+<font family="helvetica" size="2">[% article.subject %]</font>
+
+[% FOREACH file = article.files %]
+<br>
+<font family="helvetica" size="2">[% file.name %]</font>
+[% END %]
+
+[% INCLUDE footer %]

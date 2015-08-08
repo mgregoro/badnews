@@ -1,0 +1,18 @@
+<html>
+<!-- $Id: files.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>[% article.subject %]</title>
+        <link href="style/ascscyo.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div class="logo_place">
+            <img src="/images/blue_logo_fp2.gif">
+        </div>
+        <div class="watermark_place">
+            <img src="/images/ascs_watermark.gif">
+        </div>
+        <div class="overlay"></div>
+
+    </body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<badnews_config version="1.0" badnews_version="0.10">
+    <!-- theme colors config -->
+    <bg_color>#FFFFFF</bg_color>
+    <fg_color>#333333</fg_color>
+    <alt_highlight>#000000</alt_highlight>
+    <text_highlight>#FF99FF</text_highlight>
+    <ac_color1>#FF66FF</ac_color1>
+    <ac_color2>#0192CB</ac_color2>
+    <drop_shadow>#777777</drop_shadow>
+    <input_box>#666666</input_box>
+    <article_code>#BCD8E3</article_code>
+    <article_note>#FFFF99</article_note>
+
+    <!-- theme fonts config -->
+    <tiny_font_size>10px</tiny_font_size>
+    <small_font_size>11px</small_font_size>
+    <default_font_size>12px</default_font_size>
+    <medium_font_size>16px</medium_font_size>
+    <large_font_size>24px</large_font_size>
+    <comment_font_size>11px</comment_font_size>
+    <title_font_size>40px</title_font_size>
+    <subject_text_size>16px</subject_text_size>
+    <subject_alt_size>18px</subject_alt_size>
+    <fixed_big_size>30px</fixed_big_size>
+    <fixed_small_size>11px</fixed_small_size>
+    <fixed_size>14px</fixed_size>
+
+    <default_font_family>helvetica, arial, sans-serif</default_font_family>
+    <comment_font_family>helvetica, arial</comment_font_family>
+    <fixed_font_family>courier, terminal, vt100, sans-serif</fixed_font_family>
+    <subject_font_family>georgia, sans-serif</subject_font_family>
+    <subject_alt_family>georgia, sans-serif</subject_alt_family>
+
+    <!-- theme images config -->
+    <main_image>flower.gif</main_image>
+
+    <!-- geometries -->
+    <article_width>600px</article_width>
+    <comment_indent_depth>20px</comment_indent_depth>
+    <comment_spacer_height>10px</comment_spacer_height>
+
+</badnews_config>
+

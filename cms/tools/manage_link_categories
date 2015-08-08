@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+# $Id: manage_link_categories 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# manage event types!
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'Manage Link Categories',
+                tool_name           =>          'manage_link_categories',
+                description         =>          'Manage the categories used to categorize links within the system',
+                menu_position       =>          '_top, Links',
+                sufficient_flags    =>          ['s', 'a']
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::Links;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $li = BadNews::Links->obj();
+my $error = {};
+
+# get function
+my $func = $q->param('func');
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        if ($func eq "add") {
+            my $cat = $q->param('add_category');
+            $li->add_category($cat);
+            $bn->log($session->user, 'add_link_category', $cat);
+        } elsif ($func eq "delete") {
+            foreach my $param ($q->Vars) {
+                next if $param eq "func" or $param eq "add_category";
+                if ($li->delete_category($param)) {
+                    $bn->log($session->user, 'delete_link_category', $param);
+                }
+            }
+        }
+        print $q->header();
+        $tmpl->process('manage_link_categories.tt2', { title     =>      'Manage Link Categories',
+                                          error     =>      $error,
+                                          li        =>      $li,
+                                          tool_name =>      'Manage Link Categories',
+                                          tool_icon =>      '../../theme_images/control_panel/04managelink.gif' });
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

@@ -1,0 +1,14 @@
+<html>
+<!-- $Id: cms_main.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>[% title %]</title>
+        <link href="../../style/control_panel.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div class="title_text"><img border="0" src="../../theme_images/control_panel/nothing.gif" height="1" width="10">[% title %]</div>
+        <div class="tiny_text"><img border="0" src="../../theme_images/control_panel/nothing.gif" height="1" width="10">Logged in as: [% session.user %] [<a href="login?logout=1">logout</a>] - <a href="control_panel" title="switch to classic view">switch to classic view</a></div>
+        <div class="menu_iframe"><iframe frameborder="0" id="menu" name="menu" scrolling="no" width="240px" height="500px" border="0" src="menu"></iframe></div>
+        <div class="display_iframe"><iframe frameborder="0" id="display" name="display" scrolling="auto" width="640px" height="600px" border="0" src=""></iframe></div>
+    </body>
+</html>

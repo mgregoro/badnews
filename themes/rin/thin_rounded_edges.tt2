@@ -1,0 +1,64 @@
+[% thin_rounded_css_loaded = [] %]
+[% BLOCK thin_rounded_css %]
+    <style>
+        dl.thin_rounded_[% thin_rounded_color %] {
+            background: #eee url([% bn.fe_location %]/theme_images/[% fe.theme %]/thin_rounded_edges/[% thin_rounded_color %]_bg.gif) repeat;
+            margin: 0;
+            padding: 0;
+        }
+
+        dl.thin_rounded_[% thin_rounded_color %] dt.thin_rounded_[% thin_rounded_color %] {
+            background: transparent url([% bn.fe_location %]/theme_images/[% fe.theme %]/thin_rounded_edges/[% thin_rounded_color %]_tl.gif) no-repeat top left;
+            margin: 0;
+            padding: 0
+        }
+
+        dl.thin_rounded_[% thin_rounded_color %] dt.thin_rounded_[% thin_rounded_color %] a.thin_rounded_[% thin_rounded_color %] {
+            background: transparent url([% bn.fe_location %]/theme_images/[% fe.theme %]/thin_rounded_edges/[% thin_rounded_color %]_tr.gif) no-repeat top right;
+            display: block;
+            margin: 0;
+            padding: 1em 1.5em .2em 1.5em
+        }
+
+        dl.thin_rounded_[% thin_rounded_color %] dd.thin_rounded_[% thin_rounded_color %] {
+            background: transparent url([% bn.fe_location %]/theme_images/[% fe.theme %]/thin_rounded_edges/[% thin_rounded_color %]_bl.gif) no-repeat bottom left;
+            margin: 0;
+            padding: 0
+        }
+
+        dl.thin_rounded_[% thin_rounded_color %] div.thin_rounded_[% thin_rounded_color %] {
+            background: transparent url([% bn.fe_location %]/theme_images/[% fe.theme %]/thin_rounded_edges/[% thin_rounded_color %]_br.gif) no-repeat bottom right;
+            margin: 0;
+            padding: 1.33em 1.5em 2.33em 1.5em
+        }
+    </style>
+[% END %]
+
+[% BLOCK thin_rounded_edges %]
+    [% UNLESS thin_rounded_color %]
+        [% thin_rounded_color = "green" %]
+    [% END %]
+
+    [% color_is_loaded = 0 %]
+
+    [% IF thin_rounded_css_loaded.size > 0 %]
+        [% FOREACH loaded = thin_rounded_css_loaded %]
+            [% IF loaded == thin_rounded_color %]
+                [% color_is_loaded = 1 %]
+                [% LAST %]
+            [% END %]
+        [% END %]
+        [% UNLESS color_is_loaded %]
+            [% INCLUDE thin_rounded_css %]
+            [% thin_rounded_css_loaded.push(thin_rounded_color) %]
+        [% END %]
+    [% ELSE %]
+        [% INCLUDE thin_rounded_css %]
+        [% thin_rounded_css_loaded.push(thin_rounded_color) %]
+    [% END %]
+    <dl class="thin_rounded_[% thin_rounded_color %]" style="width: [% thin_rounded_width %];">
+        <dt class="thin_rounded_[% thin_rounded_color %]"><a class="thin_rounded_[% thin_rounded_color %]">[% title %]</a></dt>
+        <dd class="thin_rounded_[% thin_rounded_color %]"><div class="thin_rounded_[% thin_rounded_color %]">[% content %]</div></dd>
+    </dl>
+[% END %]
+

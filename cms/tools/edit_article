@@ -1,0 +1,172 @@
+#!/usr/bin/perl
+# $Id: edit_article 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# edit article
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'Edit An Article',
+                tool_name           =>          'edit_article',
+                description         =>          'Edit an existing article',
+                menu_position       =>          '_none',
+                sufficient_flags    =>          ['s', 'a']
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::ArticleInterface;
+use BadNews::Article;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>      $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $error = {};
+my $ai = new BadNews::ArticleInterface;
+
+my $delete = $q->param('delete');
+my $confirm = $q->param('confirm');
+my $id = $q->param('id');
+my $subject = $q->param('subject');
+my $category = $q->param('category');
+my $upload_body = $q->param('upload_body');
+
+# if the body was uploaded in a file.. take the content.. otherwise.. 
+my $body;
+if ($upload_body) {
+    my $fh = $q->upload('body');
+    {
+        local $/;
+        $body = <$fh>;
+    }
+} else {
+    $body = $q->param('body');
+}
+
+my $published = $q->param('published');
+my $enable_comments = $q->param('enable_comments');
+my $visual_editor_toggle = $q->param('visual_editor_toggle');
+my $upload_body = $q->param('upload_body');
+my @associated_links = $q->param('associated_links');
+my @associated_files = $q->param('associated_files');
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        my $article = BadNews::Article->open($id);
+        my $bnuser = $session->bnuser;
+        my $user_can_publish = ($bnuser->has_flag('p') || $bnuser->has_flag('s')) ? 1 : 0;
+        if ($article) {
+            if ($delete) {
+                # its a delete
+                if ($confirm) {
+                    # confirmed delete!
+                    my $subject = $article->subject;
+                    $article->delete;
+                    $bn->log($session->user, 'delete_article', $subject);
+                    print $q->header();
+                    $tmpl->process('t_message.tt2', {   title       =>      "Article '$subject' deleted successfully!",
+                                                        error       =>      $error,
+                                                        tool_name   =>      'Edit An Article',
+                                                        tool_icon   =>      '../../theme_images/control_panel/03editarticles.gif',
+                                                        back_to     =>      'list_articles',
+                                                        message     =>      "Article '$subject' has been successfully deleted from the article database."});
+                } else {
+                    # not confirmed.. better make sure.
+                    print $q->header();
+                    $tmpl->process('t_prompt.tt2',  {   title       =>      'Delete Article Confirm',
+                                                        error       =>      $error,
+                                                        tool_name   =>      'Edit An Article',
+                                                        no_url      =>      'javascript:window.close()',
+                                                        yes_url     =>      'edit_article?id=' . $article->id . '&delete=1&confirm=1',
+                                                        tool_icon   =>      '../../theme_images/control_panel/03editarticles.gif',
+                                                        question    =>      'Are you sure you want to delete article with subject: "' . $article->subject . '"?'});
+                }
+                exit();
+            }
+            if ($subject && $body) {
+                $article->subject($subject);
+                $article->body($ai->parse_body($body));
+                $article->associated_files(join(':', @associated_files));
+                $article->associated_links(join(':', @associated_links));
+
+                # here we go again! -- only (p)ublishers or (s)ysadmins can edit the published flag!
+                if ($user_can_publish) {
+                    $article->published($published);
+                }
+
+                $article->category($category);
+                $article->enable_comments($enable_comments);
+                $article->save;
+                $bn->log($session->user, 'edit_article', $article->subject);
+                print $q->header();
+                $tmpl->process('t_message.tt2',    {    title       =>      'Edit An Article',
+                                                        error       =>      $error,
+                                                        self        =>      'edit_article',
+                                                        message     =>      'Article ID: ' . $article->id . ' successfully updated!',
+                                                        tool_name   =>      'Edit An Article',
+                                                        tool_icon   =>      '../../theme_images/control_panel/03editarticles.gif'});
+            } else {
+                print $q->header();
+
+                my $nibr_body;
+                if ($c->NEWLINE_IS_BR) {
+                    $nibr_body = $article->body;
+                    $nibr_body =~ s/<br>/\n/g;
+                }
+
+                $tmpl->process('edit_article.tt2', {    title       =>      'Edit An Article',
+                                                        user_can_publish    =>      $user_can_publish,
+                                                        error       =>      $error,
+                                                        article     =>      $article,
+                                                        nibr_body   =>      $nibr_body,
+                                                        ai          =>      $ai,
+                                                        enable_spellchk =>  $c->ENABLE_SPELLCHECK,
+                                                        visual_editor_toggle  =>  defined($visual_editor_toggle) ? $visual_editor_toggle : $c->VISUAL_EDITOR,
+                                                        upload_body =>      defined($upload_body) ? $upload_body : 0,
+                                                        self        =>      'edit_article',
+                                                        tool_name   =>      'Edit An Article',
+                                                        tool_icon   =>      '../../theme_images/control_panel/03editarticles.gif'});
+            }
+        } else {
+            print $q->header();
+            $tmpl->process('t_generic.tt2', { title     =>      'Edit An Article',
+                                              error     =>      $error,
+                                              prompt    =>      'Please enter the article id:',
+                                              fetch     =>      'id',
+                                              action    =>      'edit_article',
+                                              tool_name =>      'Edit An Article',
+                                              tool_icon =>      '../../theme_images/control_panel/03editarticles.gif' });
+        }
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

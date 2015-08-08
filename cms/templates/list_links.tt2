@@ -1,0 +1,71 @@
+[% INCLUDE tool_top %]
+<!-- $Id: list_links.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="90%" cellspacing="0" cellpadding="0" align="center">
+            <tr>
+                <td>
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="30%" class="header_text" align="left">
+                                Short Name
+                            </td>
+                            <td width="25%" class="header_text" align="left">
+                                URL
+                            </td>
+                            <td width="15%" class="header_text" align="left">
+                                Category
+                            </td>
+                            <td width="30%" class="header_text" align="left">
+                                Long Name
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% altrow = 0 %]
+            [% FOREACH link = li.all_links %]
+            <tr>
+                <td class="altrow_[% altrow %]">
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="30%" class="tiny_text" align="left">
+                                [% link.short_name %]
+                            </td>
+                            <td width="25%" class="tiny_text" align="left">
+                                [% link.url %]
+                            </td>
+                            <td width="15%" class="tiny_text" align="left">
+                                [% link.category %]
+                            </td>
+                            <td width="20%" class="tiny_text" align="left">
+                                [% link.long_name %]
+                            </td>
+                            <td width="3%" class="tiny_text" align="right">
+                                <a href="edit_link?id=[% link.id %]&delete=1" title="delete link [% link.short_name %]...">[x]</a>
+                            </td>
+                            <td width="3%" class="tiny_text" align="right">
+                                <a href="edit_link?id=[% link.id %]" title="edit link [% link.short_name %]...">[e]</a>
+                            </td>
+                            <td width="4%" class="tiny_text" align="right">
+                                <a href="[% link.url %]" title="open link [% link.short_name %]..." target="_new">[op]</a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% IF altrow == 1 %]
+                [% altrow = 0 %]
+            [% ELSE %]
+                [% altrow = 1 %]
+            [% END %]
+            [% END %]
+            <tr valign="top">
+                <td align="right">
+                    &nbsp;
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

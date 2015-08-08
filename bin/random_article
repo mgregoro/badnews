@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use BadNews;
+use CGI;
+
+my $bn = new BadNews;
+my $q = new CGI;
+
+# get the list of articles
+my $dbh = $bn->open_db;
+my $sth = $dbh->prepare("select id from articles where published = '1'");
+$sth->execute;
+
+my @articles;
+
+while (my $ar = $sth->fetchrow_arrayref) {
+    push(@articles, $$ar[0]);
+}
+
+$q->redirect("/article/random/" . $articles[int(rand($#articles))] . "/");
+

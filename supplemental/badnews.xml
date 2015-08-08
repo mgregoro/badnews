@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<badnews_config version="1.0" badnews_version="0.21">
+
+    <!-- dont get me wrong, bN isn't anywhere near being internationalized -->
+    <default_lang>en</default_lang>
+
+    <!-- the database's DSN -->
+    <dsn>DBI:mysql:database=bndev_mg2_o_epZs;host=localhost;port=13306;mysql_socket=/usr/local/mg2dev/var/run/mysqld.sock</dsn>
+
+    <!-- database user -->
+    <db_user>CENSORED</db_user>
+
+    <!-- database password -->
+    <db_pass>CENSORED</db_pass>
+
+    <!-- how frequently we re-register the tools -->
+    <tool_registry_update_time>600</tool_registry_update_time>
+
+    <!-- the todo extended attributes cache time -->
+    <todo_ea_cache>600</todo_ea_cache>
+
+    <!-- the user extended attributes cache time -->
+    <user_ea_cache>600</user_ea_cache>
+
+    <!-- session table -->
+    <session_table>sessions</session_table>
+
+    <!-- cookie duration.. how long cookies last (when idle -->
+    <cookie_duration>3600</cookie_duration>
+
+    <!-- cookie domain which domain the cookies are valid for -->
+    <cookie_domain>bndev.mg2.org</cookie_domain>
+
+    <!-- theme path.. path to the badnews themes directory -->
+    <theme_path>/usr/local/mg2dev/sites/bndev.mg2.org/local_themes:/usr/local/mg2dev/sites/bndev.mg2.org/themes</theme_path>
+
+    <!-- cms path.. path to the badnews cms directory -->
+    <cms_path>/usr/local/mg2dev/sites/bndev.mg2.org/badnews/cms</cms_path>
+
+    <!-- user config table.. for future use -->
+    <usr_config_table>usr_config</usr_config_table>
+
+    <!-- preference convert newline to <br> and back again should be in usr_config -->
+    <newline_is_br>0</newline_is_br>
+
+    <!-- leave comments on by default? -->
+    <enable_comments>1</enable_comments>
+
+    <!-- authed to comment ? -->
+    <authed_to_comment>1</authed_to_comment>
+
+    <!-- threaded comments ? -->
+    <threaded_comments>1</threaded_comments>
+
+    <!-- enable spellchecker NOTE: requires 'aspell' be installed  -->
+    <enable_spellcheck>1</enable_spellcheck>
+
+    <!-- highlight search word in search results ?? -->
+    <highlight_search_string>1</highlight_search_string>
+
+    <!-- summary length.. the length in bytes a summary must be.  keep in mind the summary can be over this, but never u -->
+    <summary_length>255</summary_length>
+
+    <!-- system version .. -->
+    <sys_version>0.21b</sys_version>
+
+    <!-- application title -->
+    <app_title>bndev.mg2.org</app_title>
+
+    <!-- default theme.. which theme to use by default -->
+    <default_theme>local_user</default_theme>
+
+    <!-- the number of referrers to show by default -->
+    <ref_display_num>10</ref_display_num>
+
+    <!-- publish by default! applies to events, articles, and soon tasks.. -->
+    <publish_by_default>1</publish_by_default>
+
+    <!-- visual editor? turn on / off wysiwyg editor -->
+    <visual_editor>1</visual_editor>
+
+    <!-- time zone -->
+    <time_zone>EST5EDT</time_zone>
+
+    <!-- dbi cache time -->
+    <dbi_cache_time>3600</dbi_cache_time>
+
+    <!-- allow event overlap default value -->
+    <allow_event_overlap>1</allow_event_overlap>
+
+    <!-- max_recur_until the farthest in the future recurring events can recur (in years)-->
+    <max_recur_until>5</max_recur_until>
+
+    <!-- how frequently upcoming events cache is updated in seconds -->
+    <upcoming_events_cache>600</upcoming_events_cache>
+
+    <!-- how frequently the threaded comments cache is updated in seconds -->
+    <threaded_comments_cache>600</threaded_comments_cache>
+
+    <!-- collect_referrers, to collect or not to collect -->
+    <collect_referrers>0</collect_referrers>
+
+    <!-- turn strict comments ONNNN -->
+    <strict_comments>1</strict_comments>
+
+    <!-- requires strict comments set to 1, the number of page views that must occur before they can post a comment -->
+    <minimum_pages_to_post>2</minimum_pages_to_post>
+
+    <!-- template compile dir -->
+    <template_compile_dir>/usr/local/mg2dev/var/tmp/</template_compile_dir>
+
+    <!-- rss options -->
+    <rss_number_of_articles>20</rss_number_of_articles>
+    <rss_timezone>-04:00</rss_timezone>
+    <rss_site_link>http://bndev.mg2.org</rss_site_link>
+    <rss_description>the bN content management system</rss_description>
+    <rss_subject>BadNews 0.21b RSS</rss_subject>
+    <rss_creator>corrupt@mg2.org</rss_creator>
+    <rss_publisher>corrupt@mg2.org</rss_publisher>
+    <rss_copyright>(C) 2006, the mg2 organization</rss_copyright>
+    <rss_language>en-us</rss_language>
+    <rss_article_url>http://bndev.mg2.org/?page=article&amp;article_id=</rss_article_url>
+    <rss_syn_update_period>hourly</rss_syn_update_period>
+    <rss_syn_update_frequency>1</rss_syn_update_frequency>
+    <rss_syn_update_base>1901-01-01T00:00+00:00</rss_syn_update_base>
+
+</badnews_config>

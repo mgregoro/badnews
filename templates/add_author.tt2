@@ -1,0 +1,105 @@
+[% INCLUDE tool_top %]
+<!-- $Id: add_author.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="90%" cellspacing="0" cellpadding="0" align="center">
+            <tr>
+                <td>
+                    <table width="100%" cellspacing="0" cellpadding="0" align="center">
+                        <tr>
+                            <td colspan="3">
+                                <img src="/images/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <form name="add_author" action="[% self %]" method="post">
+                            <td align="left" class="header_text">
+                                User Name:
+                            </td>
+                            <td align="left">
+                                <input type="text" name="username" size="18" maxlength="64">
+                            </td>
+                            <td>
+                                <img src="/images/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <img src="/images/nothing.gif" height="5" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" class="header_text">
+                                Common Name:
+                            </td>
+                            <td align="left">
+                                <input type="text" name="common_name" size="18" maxlength="128">
+                            </td>
+                            <td>
+                                <img src="/images/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <img src="/images/nothing.gif" height="5" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" class="header_text">
+                                Password:
+                            </td>
+                            <td align="left">
+                                <input type="password" name="pass1" size="18" maxlength="128">
+                            </td>
+                            <td>
+                                <img src="/images/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <img src="/images/nothing.gif" height="5" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" class="header_text">
+                                Password Confirm:
+                            </td>
+                            <td align="left">
+                                <input type="password" name="pass2" size="18" maxlength="128">
+                            </td>
+                            <td>
+                                <img src="/images/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <img src="/images/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="33%" align="center">
+                                <img src="/images/nothing.gif" height="1" width="1">
+                            </td>
+                            <td width="33%" align="left">
+                                <input type="submit" value="Submit">
+                            </form>
+                            </td>
+                            <td width="33%" align="left">
+                                <font class="error_text">[% error.add_author %]</font>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+            </tr>
+            <script language="javascript">
+                document.add_author.username.focus();
+            </script>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

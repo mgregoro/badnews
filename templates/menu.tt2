@@ -1,0 +1,26 @@
+[% INCLUDE header %]
+<!-- $Id: menu.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    [% IF cgi.param('loc') %]
+        [% loc = cgi.param('loc') %]
+    [% ELSE %]
+        [% loc = '_top' %]
+    [% END %]
+
+    <!-- render the menu at loc (for [% loc %])-->
+    [% FOREACH item = menu.sorted_children_by_location(0, 0, loc) %]
+        [% IF item.tool %]
+            <!-- this is a tool ;) -->
+            <a href="[% item.tool %]" title="[% menu.tr.tool_by_name(item.tool).description %]" target="display">[% item.name %]</a><br>
+        [% ELSIF item.name %]
+            <!-- this is a submenu ;) -->
+            <a href="menu?loc=[% item.loc %]" title="open submenu [% item.name %]">[% item.name %]</a><br>
+        [% END %]
+    [% END %]
+
+    [% IF loc != '_top' %]
+    <br><a href="menu?loc=[% menu.parent_menu(loc) %]" title="go back a level" onClick="parent.display.location='about:blank'">Go Back</a>
+    [% ELSE %]
+        <br><a href="login?logout=1" title="log out" target="_top">Log Out</a>
+    [% END %]
+        
+[% INCLUDE footer %]

@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+# $Id: list_articles 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# list articles
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+        tool_title          =>          'List Articles',
+        tool_name           =>          'list_articles',
+        menu_position       =>          '_top, Articles',
+        description         =>          'List the articles currently in the system',
+        sufficient_flags    =>          ['s', 'a']
+    );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::ArticleInterface;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates", 
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $ai = BadNews::ArticleInterface->new();
+my $error = {};
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        print $q->header();
+        $tmpl->process('list_articles.tt2', { title     =>      'List Articles',
+                                          error     =>      $error,
+                                          ai        =>      $ai,
+                                          tool_name =>      'List Articles',
+                                          tool_icon =>      '../../theme_images/control_panel/02listarticles.gif' });
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

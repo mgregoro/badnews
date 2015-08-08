@@ -1,0 +1,119 @@
+/* stylesheet for ascscyo.org */
+/* $Id: control_panel.css 428 2006-08-30 02:00:57Z corrupt $ */
+
+A {
+    font-family: helvetica, arial, sans-serif;
+    color: #373C45;
+    text-decoration: none;
+    border: none;
+}
+
+.normal_text {
+    font-size: 12px;
+    color: #373C45;
+}
+
+.highlighted_text {
+    font-size: 12px;
+    color: #373C45;
+    background-color: #FFFF00;
+}
+
+.header_text {
+    font-size: 16px;
+    color: #373C45;
+}
+
+.title_text {
+    font-size: 24px;
+    color: #373C45;
+}
+
+td.tiny_line {
+    background-color: #373C45;
+}
+
+.tiny_text {
+    font-size: 10px;
+}
+
+.error_text {
+    font-size: 10px;
+    color: red;
+}
+
+table.no_border {
+    border: none;
+    background-color: #FFFFFF;
+}
+
+INPUT {
+    color: #373C45;
+    border: #373C45 1px solid;
+}
+
+TEXTAREA {
+    color: #373C45;
+    border: #373C45 1px solid;
+    font-size: 12px;
+    font-family: helvetica, arial, sans-serif;
+}
+
+SELECT {
+    color: #373C45;
+    border: #373C45 1px solid;
+    font-size: 12px;
+    font-family: helvetica, arial, sans-serif;
+}
+
+.text_input {
+    color: #373C45;
+    border: #373C45 1px solid;
+    font-size: 12px;
+    font-family: helvetica, arial, sans-serif;
+    font-weight: normal;
+}
+
+td.menu_area {
+    background-color: #D0D7E3;
+}
+
+td.altrow_0 {
+    background-color: #CCCCCC;
+    font-size: 10px;
+    color: #373C45;
+}
+
+td.altrow_1 {
+    background-color: #EEEEEE;
+    font-size: 10px;
+    color: #373C45;
+}
+
+td.box {
+    border: #4F5E7B 1px solid;
+    background-color: #FFFFFF;
+    color: #373C45;
+    font-family: helvetica, arial, sans-serif;
+}
+
+td.box_tab {
+    border: #4F5E7B 1px solid;
+    background-color: #4F5E7B;
+    color: #FFFFFF;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 12px;
+    text-decoration: bold;
+}
+
+BODY {
+    font-family: helvetica, arial, sans-serif;
+    font-size: 12px;
+    color: #373C45;
+    text-decoration: none;
+    vertical-align: middle;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
+}

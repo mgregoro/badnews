@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<badnews_config version="1.0" badnews_version="0.10">
+    <!-- slogan.. what shows up at the top -->
+    <icon_frame_hover_color>#71ACE4</icon_frame_hover_color>
+    <icon_frame_bg_color>#5C8DBB</icon_frame_bg_color>
+</badnews_config>
+

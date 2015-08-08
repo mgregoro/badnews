@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+# $Id: list_links 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# list links
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'List Links',
+                tool_name           =>          'list_links',
+                description         =>          'List the links in the BadNews system',
+                menu_position       =>          '_top, Links',
+                sufficient_flags    =>          ['s', 'a']
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::Links;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>      $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $error = {};
+my $li = BadNews::Links->obj();
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        print $q->header();
+        $tmpl->process('list_links.tt2', { title     =>      'List Links',
+                                          error     =>      $error,
+                                          tool_name =>      'List Links',
+                                          li        =>      $li,
+                                          tool_icon =>      '../../theme_images/control_panel/02listlinks.gif' }) or die $tmpl->error();
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

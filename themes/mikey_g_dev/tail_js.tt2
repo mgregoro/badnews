@@ -1,0 +1,9 @@
+    <script language="javascript">
+        document.article_search.search_string.focus();
+        [% FOREACH expand = fe.comma_split(fe.cgi.param('exp')) %]
+        expand([% expand %]);
+        [% END %]
+        [% FOREACH expand = fe.cgi.param('gex') %]
+        expand([% expand %]);
+        [% END %]
+    </script>

@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+# $Id: counter 428 2006-08-30 02:00:57Z corrupt $
+
+use lib('../../lib');
+
+use CGI;
+use BadNews::Session;
+use BadNews;
+
+my $q = new CGI;
+my $bn = BadNews->new();
+my ($session, $cookie);
+
+if ($q->cookie('bnanon')) {
+    $session = BadNews::Session->new(session_id     =>      $q->cookie('bnanon'));
+    unless ($session) {
+        $session = BadNews::Session->new(Anon => 1);
+        $cookie = $q->cookie(   -name=>     'bnanon',
+                                -value=>    $session->session_id,
+                                -path=>     '/',
+                                -domain=>   $bn->c->COOKIE_DOMAIN );
+    }
+} else {
+    $session = BadNews::Session->new(Anon => 1);
+    $cookie = $q->cookie(   -name=>     'bnanon',
+                            -value=>    $session->session_id,
+                            -path=>     '/',
+                            -domain=>   $bn->c->COOKIE_DOMAIN );
+}
+
+    
+
+# get the count
+my $dbh = $bn->open_db();
+my $sth = $dbh->prepare("select id, count from counter");
+$sth->execute;
+my $ar = $sth->fetchrow_arrayref;
+
+my ($id, $count) = @$ar;
+
+# if there's no counter row, create one
+unless ($id) {
+    $dbh->do("insert into counter (count) values (0)");
+}
+
+unless ($session->count_registered) {
+    # update the count!
+    $new_count = $count + 1;
+    $dbh->do("update counter set count = $new_count where id = $id");
+    $session->count_registered(1);
+}
+
+print $q->header(-cookie=>$cookie, -type=>'text/plain', -expires=>'-1d');
+print "$count";

@@ -1,0 +1,329 @@
+#!/usr/bin/perl
+
+# bbns - build bad news site
+
+# syntax: bbns user www.mg2.org
+
+my $webserv_uid = 571;
+my $webserv_gid = 571;
+my $webroot = "/mg2root/web";
+
+my $user_uid = getpwnam($ARGV[0]);
+
+unless ($user_uid) {
+    die "Can't create $site for $user: $user doesn't exist on the system.\n";
+}
+
+my $user = $ARGV[0];
+my $site = $ARGV[1];
+
+if (-e "$webroot/$site") {
+    die "Can't create $site: $site already exists.\n";
+}
+
+my $siteroot = "$webroot/$site";
+
+# site can only be 16 chars long
+my $dbu = substr($site, 0, 11) . "_" . rand_chars(4);
+
+# turn the .'s into _'s
+$dbu =~ s/\./_/g;
+
+my $dbp = rand_chars(12);
+my $db = $dbu;
+
+print "Making Database\n";
+system("/usr/local/sbin/make_mysql_db.pl $dbu $dbp");
+
+print "Setting Up Data Structure\n";
+system("/usr/bin/mysql -h localhost -u $dbu --password=$dbp $dbu < /usr/local/badnews/supplemental/badnews_table_structure.sql");
+print "\n";
+
+#if ($site =~ /^(.*)\.mg2\.org$/) {
+#    print "Setting Up DNS\n";
+#    use DNS::ZoneParse;
+#    my $dns = DNS::ZoneParse->new("/var/named/zone/mg2.org.zone");
+#    my $cname = $dns->cname;
+#    push(@$cname, { name => "$1", class => "IN", host => "mg2.org.", ttl => '' });
+#    $dns->new_serial(5);
+#    my $newfile = $dns->output();
+#    undef($dns);
+#    system("/bin/cp /var/named/zone/mg2.org.zone /tmp/mg2.org.zone.bak");
+#    open (ZONEFILE, ">/var/named/zone/mg2.org.zone") or warn "Couldn't open zone file: $!\n";
+#    print ZONEFILE $newfile;
+#    close (ZONEFILE);
+#    system("/usr/bin/killall -HUP named");
+#    print "\n";
+#}
+
+
+# make directories
+mkdir("$siteroot");
+mkdir("$siteroot/conf");
+mkdir("$siteroot/badnews");
+mkdir("$siteroot/local_themes");
+mkdir("$siteroot/user_content");
+mkdir("$siteroot/logs");
+
+# inject apache config
+my $config = <<EOF;
+ServerName $site
+ServerAdmin $user\@mg2.org
+DocumentRoot $siteroot/badnews
+Options Includes
+DirectoryIndex index.html index.htm index.php
+PerlModule BadNews::AuthBasicHandler
+PerlModule BadNews::AuthCookieHandler
+PerlSetVar bNSatisfy Any
+PerlSetVar bNLoginScript /cms/tools/login
+PerlSetVar bNCookieName bnauth
+Alias /webalizer $siteroot/webalizer
+Alias /uc $siteroot/user_content
+Alias /user_content $siteroot/user_content
+Alias /themes $siteroot/local_themes
+
+# the CGI stuff
+<Location /cms>
+    SetHandler perl-script
+    PerlHandler Apache::Registry
+    Options +ExecCGI
+</Location>
+<Location /bin>
+    SetHandler perl-script
+    PerlHandler Apache::Registry
+    Options +ExecCGI
+</Location>
+<Location /index.html>
+    SetHandler perl-script
+    Perlhandler Apache::Registry
+    Options +ExecCGI
+</Location>
+<Location />
+    AuthType BadNews::AuthCookieHandler
+    AuthName bN
+    PerlFixupHandler BadNews::AuthCookieHandler->recognize_user
+</Location>
+<Location /themes>
+    AuthType Basic
+    AuthName "bN Basic"
+    PerlAuthenHandler BadNews::AuthBasicHandler
+    require valid-user
+    DAV On
+</Location>
+
+# rewrite stuff
+RewriteEngine on
+RewriteRule ^.+files/(.+)\$ http://$site/bin/get_file?file_name=\$1 [PT]
+RewriteRule ^.+style/(.+)\.css\$  http://$site/index.html?theme=\$1&page=css_stylesheet [PT]
+#RewriteRule ^.+theme_images/(.+)/(.+)\$ http://$site/theme_images/\$1/\$2 [R]
+RewriteRule ^.+theme_images/(.+)/(.+)\$ http://$site/bin/theme_image?theme=\$1&image=\$2 [PT]
+RewriteRule ^/article/(.+)/([0-9]+)/?\$ http://$site/?page=article&article_id=\$2&\$1=1 [PT]
+RewriteRule ^/article/(.+)/(.+)/\$ http://$site/?page=article&article_category=\$2&\$1=1 [PT]
+RewriteRule ^/article/(.+)/(.+)\$ http://$site/?page=article&article_category=\$2&\$1=1 [PT]
+RewriteRule ^/page/([A-Za-z0-9_]+)/?\$ http://$site/?page=\$1 [PT]
+RewriteRule ^/resume/?\$ "http://$site/?page=article&article_category=[SYS] Resume" [PT]
+RewriteRule ^/rss/(.+)/rss.xml\$ http://$site/bin/rss?category=\$1 [PT]
+RewriteRule ^/rss/rss.xml\$ http://$site/bin/rss [PT]
+
+CustomLog $siteroot/logs/access_log combined
+ErrorLog $siteroot/logs/error_log
+
+EOF
+
+open(CONFIG, '>', "$siteroot/conf/$site.conf") or die "Can't open $siteroot/conf/$site.conf: $!\n";
+print CONFIG $config;
+close(CONFIG);
+
+# end apache config
+# inject bN config
+
+$config = <<EOF;
+
+<badnews_config version="1.0" badnews_version="0.12">
+
+    <!-- the database's DSN -->
+    <dsn>DBI:mysql:database=$db;host=localhost;port=3306</dsn>
+
+    <!-- database user -->
+    <db_user>$dbu</db_user>
+
+    <!-- database password -->
+    <db_pass>$dbp</db_pass>
+
+    <!-- how frequently we re-register the tools -->
+    <tool_registry_update_time>600</tool_registry_update_time>
+
+    <!-- the todo extended attributes cache time -->
+    <todo_ea_cache>600</todo_ea_cache>
+
+    <!-- the user extended attributes cache time -->
+    <user_ea_cache>600</user_ea_cache>
+
+    <!-- session table -->
+    <session_table>sessions</session_table>
+
+    <!-- cookie duration.. how long cookies last (when idle -->
+    <cookie_duration>3600</cookie_duration>
+
+    <!-- cookie domain which domain the cookies are valid for -->
+    <cookie_domain>$site</cookie_domain>
+
+    <!-- theme path.. path to the badnews themes directory -->
+    <theme_path>/mg2root/web/$site/local_themes:/mg2root/web/$site/themes</theme_path>
+
+    <!-- cms path.. path to the badnews cms directory -->
+    <cms_path>/mg2root/web/$site/badnews/cms</cms_path>
+
+    <!-- user config table.. for future use -->
+    <usr_config_table>usr_config</usr_config_table>
+
+    <!-- preference convert newline to <br> and back again should be in usr_config -->
+    <newline_is_br>0</newline_is_br>
+
+    <!-- leave comments on by default? -->
+    <enable_comments>1</enable_comments>
+
+    <!-- authed to comment ? -->
+    <authed_to_comment>1</authed_to_comment>
+
+    <!-- threaded comments ? -->
+    <threaded_comments>1</threaded_comments>
+
+    <!-- enable spellchecker NOTE: requires 'aspell' be installed  -->
+    <enable_spellcheck>1</enable_spellcheck>
+
+    <!-- highlight search word in search results ?? -->
+    <highlight_search_string>1</highlight_search_string>
+
+    <!-- summary length.. the length in bytes a summary must be.  keep in mind the summary can be over this, but never u -->
+    <summary_length>255</summary_length>
+
+    <!-- system version .. -->
+    <sys_version>0.12b</sys_version>
+
+    <!-- application title -->
+    <app_title>$site</app_title>
+
+    <!-- default theme.. which theme to use by default -->
+    <default_theme>local_user</default_theme>
+
+    <!-- the number of referrers to show by default -->
+    <ref_display_num>10</ref_display_num>
+
+    <!-- publish by default! applies to events, articles, and soon tasks.. -->
+    <publish_by_default>1</publish_by_default>
+
+    <!-- visual editor? turn on / off wysiwyg editor -->
+    <visual_editor>1</visual_editor>
+
+    <!-- time zone -->
+    <time_zone>EST5EDT</time_zone>
+
+    <!-- dbi cache time -->
+    <dbi_cache_time>3600</dbi_cache_time>
+
+    <!-- allow event overlap default value -->
+    <allow_event_overlap>1</allow_event_overlap>
+
+    <!-- max_recur_until the farthest in the future recurring events can recur (in years)-->
+    <max_recur_until>5</max_recur_until>
+
+    <!-- how frequently upcoming events cache is updated in seconds -->
+    <upcoming_events_cache>600</upcoming_events_cache>
+
+    <!-- how frequently the threaded comments cache is updated in seconds -->
+    <threaded_comments_cache>600</threaded_comments_cache>
+
+    <!-- collect_referrers, to collect or not to collect -->
+    <collect_referrers>0</collect_referrers>
+
+    <!-- rss options -->
+    <rss_number_of_articles>20</rss_number_of_articles>
+    <rss_timezone>-04:00</rss_timezone>
+    <rss_site_link>http://$site</rss_site_link>
+    <rss_description>the bN content management system</rss_description>
+    <rss_subject>BadNews 0.12b RSS</rss_subject>
+    <rss_creator>$user\@mg2.org</rss_creator>
+    <rss_publisher>$user\@mg2.org</rss_publisher>
+    <rss_copyright>(C) 2005, the mg2 organization</rss_copyright>
+    <rss_language>en-us</rss_language>
+    <rss_article_url>http://$site/?page=article&amp;article_id=</rss_article_url>
+    <rss_syn_update_period>hourly</rss_syn_update_period>
+    <rss_syn_update_frequency>1</rss_syn_update_frequency>
+    <rss_syn_update_base>1901-01-01T00:00+00:00</rss_syn_update_base>
+
+</badnews_config>
+EOF
+
+open(CONFIG, '>', "$siteroot/conf/badnews.xml") or die "Can't open $siteroot/conf/badnews.xml: $!\n";
+print CONFIG $config;
+close(CONFIG);
+
+# end badnews config
+# start badnews user config
+
+$config = <<EOF;
+<?xml version="1.0"?>
+<badnews_config version="1.0" badnews_version="0.12">
+    <!-- application title -->
+    <app_title>$site</app_title>
+
+    <!-- application window title -->
+    <app_window_title>$site</app_window_title>
+</badnews_config>
+EOF
+
+open(CONFIG, '>', "$siteroot/conf/badnews_user.xml") or die "Can't open $siteroot/conf/badnews_user.xml: $!\n";
+print CONFIG $config;
+close(CONFIG);
+
+# end badnews user config
+
+# symlink in bN
+symlink("/usr/local/badnews/themes", "$siteroot/themes");
+symlink("/usr/local/badnews/cms", "$siteroot/badnews/cms");
+symlink("/usr/local/badnews/images", "$siteroot/badnews/images");
+symlink("/usr/local/badnews/tiny_mce", "$siteroot/badnews/tiny_mce");
+symlink("/usr/local/badnews/bin", "$siteroot/badnews/bin");
+symlink("$siteroot/badnews/bin/index.html", "$siteroot/badnews/index.html");
+symlink("/usr/local/badnews/supplemental/control_panel.css", "$siteroot/badnews/control_panel.css");
+
+# copy in the default theme!
+system("/bin/cp -pr /usr/local/badnews/local/local_user $siteroot/local_themes");
+system("chown -R $user:webserv $siteroot/local_themes");
+system("chmod -R 770 $siteroot/local_themes");
+
+# change perms
+chown($user_uid, $webserv_gid, "$siteroot");
+chown($user_uid, $webserv_gid, "$siteroot/badnews");
+chown($user_uid, $webserv_gid, "$siteroot/user_content");
+chown($user_uid, $webserv_gid, "$siteroot/local_themes");
+chown($user_uid, $webserv_gid, "$siteroot/conf");
+chown($user_uid, $webserv_gid, "$siteroot/conf/$site.conf");
+chown($user_uid, $webserv_gid, "$siteroot/conf/badnews.xml");
+chown($user_uid, $webserv_gid, "$siteroot/conf/badnews_user.xml");
+chown($user_uid, $webserv_gid, "$siteroot/logs");
+chmod(oct(2770), "$siteroot/conf/badnews.xml");
+chmod(oct(2750), "$siteroot");
+chmod(oct(2750), "$siteroot/badnews");
+chmod(oct(2750), "$siteroot/user_content");
+chmod(oct(2750), "$siteroot/local_themes");
+chmod(oct(2750), "$siteroot/conf");
+chmod(oct(2750), "$siteroot/logs");
+
+system("/usr/local/sbin/bapa");
+
+print "Built $site for $user.\n\n";
+
+# subroutines
+
+sub rand_chars {
+    my ($num_chars) = @_;
+    my $chars;
+    my @legal_chars = (A...Z, a...z, 0...9);
+    for (my $i = $num_chars; $i > 0; --$i) {
+        $chars .= $legal_chars[int(rand(scalar(@legal_chars)))];
+    }
+    return $chars;
+}
+

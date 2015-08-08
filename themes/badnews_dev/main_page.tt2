@@ -1,0 +1,52 @@
+<html>
+<!-- $Id: main_page.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>Mike's Weblog</title>
+        <link href="/style/mg2.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div class="title_place">mike.mg2.org</font></div>
+        <div class="flower_place"><img src="images/flower.gif"></div>
+    <div class="overlay">the rants of me... mikey g</div>
+    <div class="main_column">
+        [% i = 0 %]
+        [% narticle = fe.ai.count_recent_articles(5) %]
+        [% FOREACH article = fe.ai.recent_articles(5) %]
+        [% i = i + 1 %]
+        <div class="article_spacer"><img src="images/nothing.gif" height="6" width="1"></div>
+        <div class="article">
+            [% author = fe.author_by_name(article.author) %]
+            <div class="subject_text">
+                [% article.subject %] <font class="subject_alt">by</font> [% author.common_name %] <font class="subject_alt">@</font> [% fe.ai.pretty_date(article.create_time) %]
+            </div>
+            <p class="body_text">[% article.body %]</p>
+            <div class="tiny_text" align="right">
+            [% IF article.files %]
+                Files: 
+                [% FOREACH file = article.files %]
+                <a href="/files/[% file.name %]" onMouseOver="this.style.color='#FF66FF'" onMouseOut="this.style.color='#333333'" title="download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a> 
+                [% END %]
+                [% IF article.links %]
+                    / 
+                [% END %]
+            [% END %]
+            [% IF article.links %]
+                Links:
+                [% FOREACH link = article.links %]
+                <a href="[% link.url %]" onMouseOver="this.style.color='#FF66FF'" onMouseOut="this.style.color='#333333'" title="[% link.long_name %]" target="_new">[% link.short_name %]</a> 
+                [% END %]
+            [% END %]
+            </div>
+        </div>
+        [% UNLESS i == narticle %]
+            [% IF article.files || article.links %]
+                <div class="article_spacer"><img src="images/nothing.gif" height="3" width="1"></div>
+            [% END %]
+            <div class="css_dotted"></div>
+        [% END %]
+        [% END %]
+        </div>
+    </div>
+    </body>
+</html>

@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+# $Id: add_article 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# add article
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+    
+    use BadNews::ToolRegistry::Tool;
+    
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+        tool_title          =>          'Add An Article',
+        tool_name           =>          'add_article',
+        description         =>          'Add a new article to the CMS',
+        menu_position       =>          '_top, Articles',
+        sufficient_flags     =>          ['s', 'a']
+    );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::Article;
+use BadNews::ArticleInterface;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c; 
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $ai = BadNews::ArticleInterface->new();
+my $error = {add_article    =>      '&nbsp;'};
+
+my $subject = $q->param('subject');
+my $category = $q->param('category');
+my $upload_body = $q->param('upload_body');
+
+# if the body was uploaded in a file.. take the content.. otherwise.. 
+my $body;
+if ($upload_body) {
+    my $fh = $q->upload('body');
+    {
+        local $/;
+        $body = <$fh>;
+    }
+} else {
+    $body = $q->param('body');
+}
+
+my $published = $q->param('published');
+my $enable_comments = $q->param('enable_comments');
+my $visual_editor_toggle = $q->param('visual_editor_toggle');
+my @associated_links = $q->param('associated_links');
+my @associated_files = $q->param('associated_files');
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        my $bnuser = $session->bnuser;
+
+        # does this user have permission to publish?
+        my $user_can_publish = ($bnuser->has_flag('p') || $bnuser->has_flag('s')) ? 1 : 0;
+        if ($subject && $body) {
+            print $q->header();
+            my $author = $session->user; # $ai->author_cn($session->user);
+            my $assoc_files = join(':', @associated_files);
+            my $assoc_links = join(':', @associated_links);
+            $body = $ai->parse_body($body);
+
+            # make sure we're either a (p)ublisher or a (s)ystem admin to publish!
+            if ($user_can_publish) {
+                $published = $published ? $published : 0;
+            } else {
+                $published = 0;
+            }
+
+            my $article = BadNews::Article->new(        subject             =>      $subject,
+                                                        body                =>      $body,
+                                                        author              =>      $author,
+                                                        published           =>      $published,
+                                                        associated_files    =>      $assoc_files,
+                                                        associated_links    =>      $assoc_links,
+                                                        enable_comments     =>      $enable_comments,
+                                                        category            =>      $category  );
+            if ($article) {
+                print $q->header();
+                $tmpl->process('t_message.tt2', {   title   =>      'Add An Article',
+                                                    error   =>      $error,
+                                                    tool_name   =>  'Add An Article',
+                                                    tool_icon   =>  '../../theme_images/control_panel/01addarticle.gif',
+                                                    message     =>  'Article ID:' . $article->id . ' added successfully!'});
+                $bn->log($session->user, 'add_article', $article->subject);
+                exit();
+            } else {
+                $error->{add_article} = "Yikes -- something went very very wrong. :(";
+            }
+        }
+        print $q->header();
+        $tmpl->process('add_article.tt2', { title     =>      'Add An Article',
+                                          user_can_publish  =>      $user_can_publish,
+                                          error             =>      $error,
+                                          ai                =>      $ai,
+                                          enable_spellchk   =>      $c->ENABLE_SPELLCHECK,
+                                          enable_comments   =>      $c->ENABLE_COMMENTS,
+                                          publish_by_default    =>  $c->PUBLISH_BY_DEFAULT,
+                                          visual_editor_toggle  =>  defined($visual_editor_toggle) ? $visual_editor_toggle : $c->VISUAL_EDITOR,
+                                          upload_body       =>      defined($upload_body) ? $upload_body : 0,
+                                          self              =>      'add_article',
+                                          tool_name         =>      'Add An Article',
+                                          tool_icon         =>      '../../theme_images/control_panel/01addarticle.gif' });
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

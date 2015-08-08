@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+    <head>
+        <title>Formal Resume - [% resume.data.global_info.name %] - [% resume.view %]</title>
+        <style type="text/css" media="screen">
+            @import url([% fe.bn_location %]/css/resume_screen.css);
+        </style>
+        <link rel="stylesheet" type="text/css" media="print" href="[% fe.bn_location %]/css/resume_print.css" />
+    </head>
+    <body>
+    <h1>[% resume.data.global_info.name %]</h1>
+    <p id="info_left"><a href="mailto:[% resume.data.global_info.email %]" title="Email [% resume.data.global_info.name %]">[% resume.data.global_info.email %]</a></p>
+    <p id="info_right">[% resume.data.global_info.address %]</p>
+
+[% FOREACH section = resume.data.sections %]
+    [% NEXT UNLESS resume.has_view(section, resume.view) %]
+    <h2>[% section.section %]</h2>
+    [% IF section.jobs %]
+        <!-- job section! -->
+        [% FOREACH job = section.jobs %]
+            [% NEXT UNLESS resume.has_view(job, resume.view) %]
+        <div class="job">
+            <p class="date">[% job.dates_employed %]</p>
+            <div class="job_data">
+                <h3>[% job.company %]</h3>
+                <p class="location">[% job.locality %]</p>
+                [% IF is_pdf %]
+                    <em>[% job.title %]</em>
+                [% ELSE %]
+                    <p class="position">[% job.title %]</p>
+                [% END %]
+            <ul>
+            [% FOREACH item = job.items %]
+                [% NEXT UNLESS resume.has_view(item, resume.view) %]
+                <li>[% item.item %]</li>
+                [% last_level = 0 %]
+                [% FOREACH item = resume.sub_items_ref(item) %]
+                    [% NEXT UNLESS resume.has_view(item, resume.view) %]
+                    [% UNLESS last_level %]
+                        [% last_level = item.level %]
+                        <ul>
+                    [% END %]
+                    [% IF item.level > last_level %]
+                        [% change = item.level - last_level %]
+                        [% FILTER repeat(change) %]
+                            <ul>
+                        [% END %]
+                    [% ELSIF item.level < last_level %]
+                        [% change = last_level - item.level %]
+                        [% FILTER repeat(change) %]
+                            </ul>
+                        [% END %]
+                    [% END %]
+                    [% last_level = item.level %]
+                    <li>[% item.item %]</li>
+                [% END %]
+                [% FILTER repeat(last_level) %]
+                    </ul>
+                [% END %]
+            [% END %]
+            </ul>
+            </div>
+            [% UNLESS is_pdf %]
+                <p class="date">&nbsp;</p>
+            [% END %]
+        </div>
+        [% END %]
+    [% ELSIF section.classes %]
+        <!-- class section! -->
+        [% FOREACH class = section.classes %]
+        [% NEXT UNLESS resume.has_view(class, resume.view) %]
+        <div class="job">
+            <p class="date">[% class.dates_trained %]</p>
+            <div class="job_data">
+            <h3>[% class.class %]</h3>
+            <p class="location">[% class.locality %]</p>
+            [% IF is_pdf %]
+                <em>[% class.trainer %]</em>
+            [% ELSE %]
+                <p class="position">[% class.trainer %]</p>
+            [% END %]
+            <ul>
+            [% FOREACH item = class.items %]
+                [% NEXT UNLESS resume.has_view(item, resume.view) %]
+                <li>[% item.item %]</li>
+                [% last_level = 0 %]
+                [% FOREACH item = resume.sub_items_ref(item) %]
+                    [% NEXT UNLESS resume.has_view(item, resume.view) %]
+                    [% UNLESS last_level %]
+                        [% last_level = item.level %]
+                        <ul>
+                    [% END %]
+                    [% IF item.level > last_level %]
+                        [% change = item.level - last_level %]
+                        [% FILTER repeat(change) %]
+                            <ul>
+                        [% END %]
+                    [% ELSIF item.level < last_level %]
+                        [% change = last_level - item.level %]
+                        [% FILTER repeat(change) %]
+                            </ul>
+                        [% END %]
+                    [% END %]
+                    [% last_level = item.level %]
+                    <li>[% item.item %]</li>
+                [% END %]
+                [% FILTER repeat(last_level) %]
+                    </ul>
+                [% END %]
+            [% END %]
+            </ul>
+            </div>
+            [% UNLESS is_pdf %]
+                <p class="date">&nbsp;</p>
+            [% END %]
+        </div>
+        [% END %]
+    [% ELSIF section.tutorials %]
+        <!-- tutorial section -->
+        [% FOREACH tutorial = section.tutorials %]
+            [% NEXT UNLESS resume.has_view(tutorial, resume.view) %]
+            <div class="job">
+            [% UNLESS is_pdf %]
+                <p class="date">&nbsp;</p>
+            [% END %]
+            <div class="job_data">
+                <h3>[% tutorial.trainer %]</h3>
+                <p class="location">[% tutorial.locality %]</p>
+                [% IF is_pdf %]
+                    <em>[% tutorial.tutorial %]</em>
+                [% ELSE %]
+                    <p class="position">[% tutorial.tutorial %]</p>
+                [% END %]
+            </div>
+            <p class="date">&nbsp;</p>
+        </div>
+        [% END %]
+    [% ELSIF section.projects %]
+        <!-- projects section -->
+        [% FOREACH project = section.projects %]
+            [% NEXT UNLESS resume.has_view(project, resume.view) %]
+            <div class="job">
+            [% UNLESS is_pdf %]
+                <p class="date">&nbsp;</p>
+            [% END %]
+            <div class="job_data">
+                <h3>[% project.title %]</h3>
+                [% UNLESS is_pdf %]
+                    <p class="location">&nbsp;</p>
+                [% END %]
+                [% IF is_pdf %]
+                    <em>[% project.company %] - [% project.role %]</em>
+                [% ELSE %]
+                    <p class="position">[% project.company %] - [% project.role %]</p>
+                [% END %]
+            <ul>
+            [% FOREACH item = project.items %]
+                [% NEXT UNLESS resume.has_view(item, resume.view) %]
+                <li>[% item.item %]</li>
+                [% last_level = 0 %]
+                [% FOREACH item = resume.sub_items_ref(item) %]
+                    [% NEXT UNLESS resume.has_view(item, resume.view) %]
+                    [% UNLESS last_level %]
+                        [% last_level = item.level %]
+                        <ul>
+                    [% END %]
+                    [% IF item.level > last_level %]
+                        [% change = item.level - last_level %]
+                        [% FILTER repeat(change) %]
+                            <ul>
+                        [% END %]
+                    [% ELSIF item.level < last_level %]
+                        [% change = last_level - item.level %]
+                        [% FILTER repeat(change) %]
+                            </ul>
+                        [% END %]
+                    [% END %]
+                    [% last_level = item.level %]
+                    <li>[% item.item %]</li>
+                [% END %]
+                [% FILTER repeat(last_level) %]
+                    </ul>
+                [% END %]
+            [% END %]
+            </ul>
+            </div>
+            [% UNLESS is_pdf %]
+                <p class="date">&nbsp;</p>
+            [% END %]
+        </div>
+        [% END %]
+    [% ELSE %]
+        <!-- generic section -->
+        <ul class="bullets">
+        [% FOREACH item = section.items %]
+            [% NEXT UNLESS resume.has_view(item, resume.view) %]
+            <li>[% item.item %]</li>
+            [% last_level = 0 %]
+            [% FOREACH item = resume.sub_items_ref(item) %]
+                [% NEXT UNLESS resume.has_view(item, resume.view) %]
+                [% UNLESS last_level %]
+                    [% last_level = item.level %]
+                    <ul>
+                [% END %]
+                [% IF item.level > last_level %]
+                    [% change = item.level - last_level %]
+                    [% FILTER repeat(change) %]
+                        <ul>
+                    [% END %]
+                [% ELSIF item.level < last_level %]
+                    [% change = last_level - item.level %]
+                    [% FILTER repeat(change) %]
+                        </ul>
+                    [% END %]
+                [% END %]
+                [% last_level = item.level %]
+                <li>[% item.item %]</li>
+            [% END %]
+            [% FILTER repeat(last_level) %]
+                </ul>
+            [% END %]
+        [% END %]
+        </ul>
+    [% END %]
+    <br/>
+[% END %]
+    [% UNLESS is_pdf %]
+    <span>View <a href="resume.pdf" title="view pdf version">PDF</a></span>
+    [% END %]
+    </body>
+</html>
+

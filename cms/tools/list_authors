@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+# $Id: list_authors 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# list authors!
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'List Authors',
+                tool_name           =>          'list_authors',
+                description         =>          'List users with author privileges',
+                menu_position       =>          '_top, Authors',
+                sufficient_flags    =>          ['s']
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::Author;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $ai = BadNews::Author->obj();
+my $error = {};
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        my $autho = $session->bnuser;
+        unless ($autho->has_flag('a')) {
+            print $q->header();
+            $tmpl->process('t_message.tt2', {   title           =>          'Access Denied',
+                                                self            =>          'list_authors',
+                                                message         =>          'Author: ' . $session->user . ' does not have the privileges required to access this tool.',
+                                                tool_name       =>          'List Authors - Access Denied',
+                                                tool_icon       =>          '../../theme_images/control_panel/02editauthor.gif'});
+            exit();
+        }
+        print $q->header();
+        $tmpl->process('list_authors.tt2', { title     =>      'List Authors',
+                                          error     =>      $error,
+                                          ai        =>      $ai,
+                                          tool_name =>      'List Authors',
+                                          tool_icon =>      '../../theme_images/control_panel/02editauthor.gif' });
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

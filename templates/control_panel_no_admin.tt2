@@ -1,0 +1,478 @@
+[% INCLUDE header %]
+<!-- $Id: control_panel_no_admin.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <script language="javascript">
+        if (document.images) 
+        {
+            icon1 = new Image();
+            icon1.src = "/images/icon.gif";
+
+            icon2 = new Image();
+            icon2.src = "/images/icon2.gif";
+
+            addevent1 = new Image();
+            addevent1.src = "/images/01addevent.gif";
+
+            addevent2 = new Image();
+            addevent2.src = "/images/01addevent_roll.gif";
+
+            listevents1 = new Image();
+            listevents1.src = "/images/02listevents.gif";
+
+            listevents2 = new Image();
+            listevents2.src = "/images/02listevents_roll.gif";
+
+            editevent1 = new Image();
+            editevent1.src = "/images/03editevent.gif";
+
+            editevent2 = new Image();
+            editevent2.src = "/images/03editevent_roll.gif";
+
+            managetypes1 = new Image();
+            managetypes1.src = "/images/04manageevent.gif";
+
+            managetypes2 = new Image();
+            managetypes2.src = "/images/04manageevent_roll.gif";
+
+            addarticle1 = new Image();
+            addarticle1.src = "/images/01addarticle.gif";
+
+            addarticle2 = new Image();
+            addarticle2.src = "/images/01addarticle_roll.gif";
+
+            listarticles1 = new Image();
+            listarticles1.src = "/images/02listarticles.gif";
+
+            listarticles2 = new Image();
+            listarticles2.src = "/images/02listarticles_roll.gif";
+
+            editarticle1 = new Image();
+            editarticle1.src = "/images/03editarticles.gif";
+
+            editarticle2 = new Image();
+            editarticle2.src = "/images/03editarticles_roll.gif";
+
+            addfile1 = new Image();
+            addfile1.src = "/images/01addfiles.gif";
+
+            addfile2 = new Image();
+            addfile2.src = "/images/01addfiles_roll.gif";
+
+            deletefile1 = new Image();
+            deletefile1.src = "/images/03deletefile.gif";
+
+            deletefile2 = new Image();
+            deletefile2.src = "/images/03deletefile_roll.gif";
+
+            editfile1 = new Image();
+            editfile1.src = "/images/edit_file_associations.gif";
+
+            editfile2 = new Image();
+            editfile2.src = "/images/edit_file_associations_inv.gif";
+
+            listfiles1 = new Image();
+            listfiles1.src = "/images/02listfiles.gif";
+
+            listfiles2 = new Image();
+            listfiles2.src = "/images/02listfiles_roll.gif";
+
+            addlink1 = new Image();
+            addlink1.src = "/images/01addlink.gif";
+
+            addlink2 = new Image();
+            addlink2.src = "/images/01addlink_roll.gif";
+
+            editlink1 = new Image();
+            editlink1.src = "/images/03deletelink.gif";
+
+            editlink2 = new Image();
+            editlink2.src = "/images/03deletelink_roll.gif";
+
+            listlinks1 = new Image();
+            listlinks1.src = "/images/02listlinks.gif";
+
+            listlinks2 = new Image();
+            listlinks2.src = "/images/02listlinks_roll.gif";
+
+            changepass1 = new Image();
+            changepass1.src = "/images/04changepass.gif";
+
+            changepass2 = new Image();
+            changepass2.src = "/images/04changepass_roll.gif";
+
+            managecategories1 = new Image();
+            managecategories1.src = "/images/04managelink.gif";
+
+            managecategories2 = new Image();
+            managecategories2.src = "/images/04managelink_roll.gif";
+
+            manageartcat1 = new Image();
+            manageartcat1.src = "/images/04managearticle.gif";
+
+            manageartcat2 = new Image();
+            manageartcat2.src = "/images/04managearticle_roll.gif";
+
+            manageartcom1 = new Image();
+            manageartcom1.src = "/images/04managearticle.gif";
+
+            manageartcom2 = new Image();
+            manageartcom2.src = "/images/04managearticle_roll.gif";
+        }
+        function roll_over(img_name, img)
+        {
+            document[img_name].src = img.src;
+        }
+        function pop_open(url)
+        {
+            window.open(url, url, "width=640,height=560,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+    </script>
+    <table width="100%" height="100%" align="center" cellpadding="0" cellspacing="0">
+        <tr height="5%" valign="bottom">
+            <td>
+                <table width="100%" align="center" cellpadding="0" cellspacing="0">
+                    <tr valign="bottom">
+                        <td align="left" width="75%">
+                            <div class="title_text"><img border="0" src="/images/nothing.gif" height="1" width="10">[% title %]</div>
+                        </td>
+                        <td align="right" width="25%">
+                            <div class="tiny_text">Logged in as: [% session.user %] [<a href="/cms/login?logout=1">logout</a>]</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr height="5%" valign="top">
+            <td>
+                [% INCLUDE tiny_line_left %]
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img border="0" src="/images/nothing.gif" height="25" width="1">
+            </td>
+        </tr>
+        <tr height="85%">
+            <td>
+                <table width="100%" height="100%" align="center" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td align="left">
+                            <div class="header_text">Event Management</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            [% INCLUDE tiny_line_short %]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="10" width="1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table width="100%" align="center" cellpadding="0" cellspacing="0">
+                                <tr height="64">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('add_event')" onMouseOver="roll_over('button1', addevent2)" onMouseOut="roll_over('button1', addevent1)"><img border="0" src="/images/01addevent.gif" name="button1"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('list_events')" onMouseOver="roll_over('button2', listevents2)" onMouseOut="roll_over('button2', listevents1)"><img border="0" src="/images/02listevents.gif" name="button2"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('edit_event')" onMouseOver="roll_over('button3', editevent2)" onMouseOut="roll_over('button3', editevent1)"><img border="0" src="/images/03editevent.gif" name="button3"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('manage_types')" onMouseOver="roll_over('button4', managetypes2)" onMouseOut="roll_over('button4', managetypes1)"><img border="0" src="/images/04manageevent.gif" name="button4"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                </tr>
+                                <tr height="32">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('add_event')" class="normal_text" onMouseOver="roll_over('button1', addevent2)" onMouseOut="roll_over('button1', addevent1)">Add An Event</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('list_events')" class="normal_text" onMouseOver="roll_over('button2', listevents2)" onMouseOut="roll_over('button2', listevents1)">List Events</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('edit_event')" class="normal_text" onMouseOver="roll_over('button3', editevent2)" onMouseOut="roll_over('button3', editevent1)">Edit/Delete Event</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('manage_types')" class="normal_text" onMouseOver="roll_over('button4', managetypes2)" onMouseOut="roll_over('button4', managetypes1)">Manage Event Types</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="25" width="1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            <div class="header_text">Article Management</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            [% INCLUDE tiny_line_short %]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="10" width="1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table width="100%" align="center" cellpadding="0" cellspacing="0">
+                                <tr height="64">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('add_article')" onMouseOver="roll_over('button6', addarticle2)" onMouseOut="roll_over('button6', addarticle1)"><img border="0" src="/images/01addarticle.gif" name="button6"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('list_articles')" onMouseOver="roll_over('button7', listarticles2)" onMouseOut="roll_over('button7', listarticles1)"><img border="0" src="/images/02listarticles.gif" name="button7"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('edit_article')" onMouseOver="roll_over('button8', editarticle2)" onMouseOut="roll_over('button8', editarticle1)"><img border="0" src="/images/03editarticles.gif" name="button8"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('manage_art_categories')" onMouseOver="roll_over('button9', manageartcat2)" onMouseOut="roll_over('button9', manageartcat1)"><img border="0" src="/images/04managearticle.gif" name="button9"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('manage_art_comments')" onMouseOver="roll_over('button10', manageartcom2)" onMouseOut="roll_over('button10', manageartcom1)"><img border="0" src="/images/04managearticle.gif" name="button10"></a>
+                                    </td>
+                                </tr>
+                                <tr height="32">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('add_article')" class="normal_text" onMouseOver="roll_over('button6', addarticle2)" onMouseOut="roll_over('button6', addarticle1)">Add An Article</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('list_articles')" class="normal_text" onMouseOver="roll_over('button7', listarticles2)" onMouseOut="roll_over('button7', listarticles1)">List Articles</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('edit_article')" class="normal_text" onMouseOver="roll_over('button8', editarticle2)" onMouseOut="roll_over('button8', editarticle1)">Edit/Delete Article</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('manage_art_categories')" class="normal_text" onMouseOver="roll_over('button9', manageartcat2)" onMouseOut="roll_over('button9', manageartcat1)">Manage Article Categories</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('manage_art_comments')" class="normal_text" onMouseOver="roll_over('button10', manageartcom2)" onMouseOut="roll_over('button10', manageartcom1)">Manage Article Comments</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="25" width="1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            <div class="header_text">File Management</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            [% INCLUDE tiny_line_short %]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="10" width="1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table width="100%" align="center" cellpadding="0" cellspacing="0">
+                                <tr height="64">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('add_file')" onMouseOver="roll_over('button11', addfile2)" onMouseOut="roll_over('button11', addfile1)"><img border="0" src="/images/01addfiles.gif" name="button11"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('list_files')" onMouseOver="roll_over('button12', listfiles2)" onMouseOut="roll_over('button12', listfiles1)"><img border="0" src="/images/02listfiles.gif" name="button12"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('delete_file')" onMouseOver="roll_over('button13', deletefile2)" onMouseOut="roll_over('button13', deletefile1)"><img border="0" src="/images/03deletefile.gif" name="button13"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                </tr>
+                                <tr height="32">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('add_file')" class="normal_text" onMouseOver="roll_over('button11', addfile2)" onMouseOut="roll_over('button11', addfile1)">Add A New File</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('list_files')" class="normal_text" onMouseOver="roll_over('button12', listfiles2)" onMouseOut="roll_over('button12', listfiles1)">List Files</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('delete_file')" class="normal_text" onMouseOver="roll_over('button13', deletefile2)" onMouseOut="roll_over('button13', deletefile1)">Delete a File</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="25" width="1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            <div class="header_text">Link Management</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            [% INCLUDE tiny_line_short %]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="10" width="1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table width="100%" align="center" cellpadding="0" cellspacing="0">
+                                <tr height="64">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('add_link')" onMouseOver="roll_over('button16', addlink2)" onMouseOut="roll_over('button16', addlink1)"><img border="0" src="/images/01addlink.gif" name="button16"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('list_links')" onMouseOver="roll_over('button17', listlinks2)" onMouseOut="roll_over('button17', listlinks1)"><img border="0" src="/images/02listlinks.gif" name="button17"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('edit_link')" onMouseOver="roll_over('button18', editlink2)" onMouseOut="roll_over('button18', editlink1)"><img border="0" src="/images/03deletelink.gif" name="button18"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('manage_link_categories')" onMouseOver="roll_over('button19', managecategories2)" onMouseOut="roll_over('button19', managecategories1)"><img border="0" src="/images/04managelink.gif" name="button19"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                </tr>
+                                <tr height="32">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('add_link')" class="normal_text" onMouseOver="roll_over('button16', addlink2)" onMouseOut="roll_over('button16', addlink1)">Add A Link</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('list_links')" class="normal_text"onMouseOver="roll_over('button17', listlinks2)" onMouseOut="roll_over('button17', listlinks1)">List Links</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('edit_link')" class="normal_text" onMouseOver="roll_over('button18', editlink2)" onMouseOut="roll_over('button18', editlink1)">Edit/Delete Link</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('manage_link_categories')" class="normal_text" onMouseOver="roll_over('button19', managecategories2)" onMouseOut="roll_over('button19', managecategories1)">Manage Link Categories</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="25" width="1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            <div class="header_text">System Management</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            [% INCLUDE tiny_line_short %]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="10" width="1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table width="100%" align="center" cellpadding="0" cellspacing="0">
+                                <tr height="64">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('change_password')" onMouseOver="roll_over('button24', changepass2)" onMouseOut="roll_over('button24', changepass1)"><img border="0" src="/images/04changepass.gif" name="button24"></a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                </tr>
+                                <tr height="32">
+                                    <td width="20%" align="center">
+                                        <a href="javascript:pop_open('change_password')" class="normal_text" onMouseOver="roll_over('button24', changepass2)" onMouseOut="roll_over('button24', changepass1)">Change Password</a>
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                    <td width="20%" align="center">
+                                        <img border="0" src="/images/nothing.gif" height="1" width="1">
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img border="0" src="/images/nothing.gif" height="25" width="1">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+[% INCLUDE footer %]
+
+[% BLOCK tiny_line_short %]
+        <table width="100%" align="left" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="tiny_line" width="33%"><img border="0" src="/images/nothing.gif" height="1" width="20"></td>
+                <td width="67%"><img border="0" src="/images/nothing.gif" height="1" width="20"></td>
+            </tr>
+        </table>
+[% END %]
+
+[% BLOCK tiny_line_left %]
+        <table width="100%" align="left" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="tiny_line"><img border="0" src="/images/nothing.gif" height="1" width="20"></td>
+            </tr>
+        </table>
+[% END %]

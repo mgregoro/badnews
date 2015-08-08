@@ -1,0 +1,118 @@
+[% INCLUDE header %]
+<!-- $Id: login.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <table width="100%" height="100%" cellspacing="0" cellpadding="0">
+        <tr height="33%">
+            <td>
+                <img src="/images/nothing.gif" height="1" width="1">
+            </td>
+        </tr>
+        <tr height="33%">
+            <td valign="middle">
+                <table width="100%" height="100%" cellspacing="0" cellpadding="0" align="center" valign="center">
+                    <tr>
+                        <td width="33%">
+                            &nbsp;
+                        </td>
+                        <td width="33%">
+                            <table width="320" height="180" cellspacing="0" cellpadding="0" align="center" valign="center">
+                                <tr>
+                                    <td align="center" width="20%" class="box_tab">
+                                        Login
+                                    </td>
+                                    <td align="center" width="80%">
+                                        <img src="/images/nothing.gif" height="1" width="180">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" width="100%" height="100%" class="box" colspan="2">
+                                        <table width="320" height="180" cellspacing="0" cellpadding="1" align="center" valign="center">
+                                            <tr>
+                                                <td colspan="4">
+                                                    &nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" colspan="4">
+                                                    <div class="normal_text">BadNews Content Management Login</div>
+                                                </td>
+                                            </tr>
+                                            <form name="login" action="login" method="post">
+                                            <tr>
+                                                <td colspan="4">
+                                                    &nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="25%">
+                                                    &nbsp;
+                                                </td>
+                                                <td colspan="1" align="left" width="25%">
+                                                    <div class="normal_text">Login:</div>
+                                                </td>
+                                                <td colspan="1" align="left" width="25%">
+                                                    <input type="text" size="16" maxlength="28" name="username">
+                                                </td>
+                                                <td width="25%">
+                                                    &nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4">
+                                                    &nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="25%">
+                                                    &nbsp;
+                                                </td>
+                                                <td colspan="1" align="left" width="25%">
+                                                    <div class="normal_text">Password:</div>
+                                                </td>
+                                                <td colspan="1" align="left" width="25%">
+                                                    <input type="password" size="16" maxlength="28" name="password">
+                                                </td>
+                                                <td width="25%">
+                                                    &nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4">
+                                                    <div class="error_text" align="center">[% error.login %]</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" width="75%">
+                                                    &nbsp;
+                                                </td>
+                                                <td width="25%">
+                                                    <input type="submit" value="Login" name="submit">
+                                                    <img src="/images/nothing.gif" height="1" width="10">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4">
+                                                    &nbsp;
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="33%">
+                            &nbsp;
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr height="34%" valign="bottom">
+            <td align="right">
+                <div class="tiny_text"> BadNews CMS [% version %] &copy; 2005 the mg2 organization </div>
+            </td>
+        </tr>
+    </table>
+    <script language="javascript">
+        document.login.username.focus();
+    </script>
+[% INCLUDE footer %]

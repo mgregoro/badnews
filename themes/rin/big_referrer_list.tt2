@@ -1,0 +1,21 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head profile="http://gmpg.org/xfn/11">
+    <style type="text/css" media="screen">
+        @import url( http://mike.mg2.org/style/[% fe.theme %].css );
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <div id="container" class="clearfix">
+<ul>
+[% FOREACH referrer = fe.ri.last_referrers(fe.uri.3, fe.uri.4) %]
+    [% IF referrer.search_engine != "none" %]
+    <li><a href="[% referrer.full_href %]" title="[% referrer.query_string %] @ [% referrer.search_engine %]">[% referrer.search_engine %] - [% referrer.query_string %]</a></li>
+    [% ELSE %]
+    <li><a href="[% referrer.full_href %]" title="go to site [% referrer.full_href %]">[% referrer.tidy_href(125) %]</a></li>
+    [% END %]
+[% END %]
+</ul>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+# $Id: template_test 428 2006-08-30 02:00:57Z corrupt $
+
+use BadNews::Article;
+use Template;
+
+my $article = BadNews::Article->open(1);
+
+my $tmpl = Template->new({INCLUDE_PATH   =>      '/mg2web/www.ascscyo.org/templates',
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2)],
+                         TRIM           =>      1});
+
+my $q = new CGI;
+
+print $q->header();
+$tmpl->process('template_test.tt2', { article   =>  $article,
+                                      title     =>  'template test' });

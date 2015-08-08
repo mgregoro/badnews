@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+# $Id: add_event 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# add event
+#
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+        tool_title          =>          'Add An Event',
+        tool_name           =>          'add_event',
+        description         =>          'Add an event to the calendar',
+        menu_position       =>          '_top, Calendar',
+        sufficient_flags    =>          ['s', 'a']
+    );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::CalendarInterface;
+use BadNews::Calendar::Event;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>      $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $ci = new BadNews::CalendarInterface;
+my $error = { event =>  '&nbsp;'};
+
+# pull the from date
+my $fm = $q->param('from_month');
+my $fd = $q->param('from_day');
+my $fy = $q->param('from_year');
+my $fh = $q->param('from_hour');
+my $fmin = $q->param('from_minute');
+my $fampm = $q->param('from_ampm');
+
+# pull the to date
+my $tm = $q->param('to_month');
+my $td = $q->param('to_day');
+my $ty = $q->param('to_year');
+my $th = $q->param('to_hour');
+my $tmin = $q->param('to_minute');
+my $tampm = $q->param('to_ampm');
+
+# pull the other info
+my $place = $q->param('place');
+my $type = $q->param('type');
+my $description = $q->param('description');
+my $summary = $q->param('short_description');
+my $show_event = $q->param('show_event');
+
+# recurring stuff
+my $recur_qty = $q->param('recur_qty');
+my $recur_type = $q->param('recur_type');
+my $recur_interval;
+my $recurring_event;
+
+my $rm = $q->param('recur_month');
+my $rd = $q->param('recur_day');
+my $ry = $q->param('recur_year');
+my $rh = $q->param('recur_hour');
+my $rmin = $q->param('recur_minute');
+my $rampm = $q->param('recur_ampm');
+
+# if the recur quantity is a number..
+if ($recur_qty =~ /^\d+$/o && $recur_qty > 0) {
+    # and there's a recur type
+    if ($recur_type) {
+        # form the recur interval
+        $recur_interval = $recur_qty . substr($recur_type, 0, 1);
+
+        # set the recurring_event flag to a true value
+        $recurring_event = 1;
+    }
+}
+
+# may as well resolve them
+my $from_ez = $ci->funk_to_ezdate("$fm/$fd/$fy $fh:$fmin:00 $fampm") if $fy;
+my $to_ez = $ci->funk_to_ezdate("$tm/$td/$ty $th:$tmin:00 $tampm") if $ty;
+my $recur_ez = ($ry and $recurring_event) ? $ci->funk_to_ezdate("$rm/$rd/$ry $rh:$rmin:00 $rampm") : 0;
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        if ($fy && $ty && $place && $summary) {
+            # its a post with enough info for an event!
+            # get the coordinator
+            my $coordinator = $session->user;
+            if ($to_ez > $from_ez) {
+                my %event = (
+                    start_time        =>      "$from_ez",
+                    end_time          =>      "$to_ez",
+                    coordinator       =>      $coordinator,
+                    place             =>      $place,
+                    summary           =>      $summary,
+                    description       =>      $description,
+                    type              =>      $type,
+                    recurring_event   =>      $recurring_event,
+                    recur_interval    =>      $recur_interval,
+                    recur_until       =>      "$recur_ez",
+                    show_event        =>      $show_event
+                );
+
+                # here is where we check for conflicts
+                my $conflicting_events;
+                my @event_objects;
+                my $conflicts = 0;
+                my @projected_dates;
+
+                if ($recurring_event) {
+                    @projected_dates = $ci->project_recur_dates(\%event);
+                    $event{projected_dates} = \@projected_dates;
+                } 
+
+                # if type overlap isn't allowed, check for type overlap..
+                if (!$ci->type_allows_overlap($event{type})) {
+                    my @events = $ci->check_overlap_by_type($event{start_time}, $event{type}, $recurring_event);
+                    foreach my $projected_date (@projected_dates) {
+                        push(@events, $ci->check_overlap_by_type($projected_date->{start_time}, $event{type}, $recurring_event));
+                    }
+                    foreach my $event (@events) {
+                        if (ref($event) eq "BadNews::Calendar::Event") {
+                            unless (exists($conflicting_events->{$event->id})) {
+                                push(@event_objects, $event);
+                            }
+                            ++$conflicting_events->{$event->id};
+                            ++$conflicts;
+                        }
+                    }
+                }
+
+                # if place overlap isn't allowed, check for place overlap.
+                if (!$ci->place_allows_overlap($event{place})) {
+                    my (@events) = $ci->check_overlap_by_place($event{start_time}, $event{place}, $recurring_event);
+                    foreach my $projected_date (@projected_dates) {
+                        push(@events, $ci->check_overlap_by_place($projected_date->{start_time}, $event{place}, $recurring_event));
+                    }
+                    foreach my $event (@events) {
+                        if (ref($event) eq "BadNews::Calendar::Event") {
+                            unless (exists($conflicting_events->{$event->id})) {
+                                push(@event_objects, $event);
+                            }
+                            ++$conflicting_events->{$event->id};
+                            ++$conflicts;
+                        }
+                    }
+                }
+
+                # check if we had a conflict!
+                if ($conflicts) {
+                    # we did!
+                    print $q->header();
+                    $tmpl->process('event_conflicts.tt2', {
+                                        title        =>      'Conflicts Found!!',
+                                        error        =>      $error,
+                                        tool_name    =>      'Add An Event',
+                                        event        =>      \%event,
+                                        tool_icon    =>      '../../theme_images/control_panel/01addevent.gif',
+                                        conflicting_events  =>  \@event_objects,
+                    }) or print "$@<BR>\n";
+                    exit();
+                } else {
+                    # we didn't!
+                    my $event = BadNews::Calendar::Event->new(%event);
+
+                    $bn->log($session->user, 'add_event', $event->description);
+
+                    print $q->header();
+                    $tmpl->process('add_event2.tt2', { title        =>      'Event Successfully Added!',
+                                        error        =>      $error,
+                                        tool_name    =>      'Add An Event',
+                                        publish_by_default   =>      $c->PUBLISH_BY_DEFAULT,
+                                        event        =>      $event,
+                                        tool_icon    =>      '../../theme_images/control_panel/01addevent.gif'}) or print "$@<BR>\n";
+                    exit();
+                }
+            } else {
+                $error->{event} = "Impossible date configuration.";
+                print $q->header();
+                $tmpl->process('add_event.tt2', { title     =>      'Add An Event',
+                                error     =>      $error,
+                                tool_name =>      'Add An Event',
+                                publish_by_default  =>  $c->PUBLISH_BY_DEFAULT,
+                                ci        =>      $ci,
+                                tool_icon =>      '../../theme_images/control_panel/01addevent.gif' });
+                exit();
+            }
+        } else {
+            print $q->header();
+            $tmpl->process('add_event.tt2', { title     =>      'Add An Event',
+                                              error     =>      $error,
+                                              tool_name =>      'Add An Event',
+                                              publish_by_default    =>      $c->PUBLISH_BY_DEFAULT,
+                                              ci        =>      $ci,
+                                              tool_icon =>      '../../theme_images/control_panel/01addevent.gif' });
+            exit();
+        }
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

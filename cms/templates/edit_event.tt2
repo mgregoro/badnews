@@ -1,0 +1,324 @@
+[% INCLUDE tool_top %]
+<!-- $Id: edit_event.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="100%" height="100%" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="10" width="1">
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                    <table width="80%" height="100%" cellspacing="0" cellpadding="0" align="center">
+                        <form name="event" action="edit_event" method="post">
+                        <input type="hidden" name="id" value="[% event.id %]">
+                        <tr valign="top">
+                            <td align="left" class="header_text">
+                                Event Start Time:
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <td>
+                                <select name="from_month">
+                                    <option selected value="[% ci.month %]">[% ci.month %]</option>
+                                    [% FOREACH month = ci.nmonths %]
+                                    [% NEXT IF month == ci.month %]
+                                    <option value="[% month %]">[% month %]</option>
+                                    [% END %]
+                                </select>
+                                <font class="normal_text">/</font>
+                                <select name="from_day">
+                                    <option selected value="[% ci.day %]">[% ci.day %]</option>
+                                    [% FOREACH day = ci.ndays %]
+                                    [% NEXT IF day == ci.day %]
+                                    <option value="[% day %]">[% day %]</option>
+                                    [% END %]
+                                </select>
+                                <font class="normal_text">/</font>
+                                <select name="from_year">
+                                    <option selected value="[% ci.year %]">[% ci.year %]</option>
+                                    [% FOREACH year = ci.next_few_years %]
+                                    [% NEXT IF year == ci.year %]
+                                    <option value="[% year %]">[% year %]</option>
+                                    [% END %]
+                                </select>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="15">
+                                <font class="header_text">@</font>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="15">
+                                <select name="from_hour">
+                                    <option selected value="[% ci.hour %]">[% ci.hour %]</option>
+                                    [% FOREACH hour = ci.nhours %]
+                                    [% NEXT IF hour == ci.hour %]
+                                    <option value="[% hour %]">[% hour %]</option>
+                                    [% END %]
+                                </select>
+                                <font class="normal_text">:</font>
+                                <select name="from_minute">
+                                    <option selected value="[% ci.min %]">[% ci.min %]</option>
+                                    [% IF ci.min != "00" %]
+                                    <option value="00">00</option>
+                                    [% END %]
+                                    [% FOREACH min = ci.rmins %]
+                                    [% NEXT IF min == ci.min %]
+                                    <option value="[% min %]">[% min %]</option>
+                                    [% END %]
+                                </select>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="5">
+                                <select name="from_ampm">
+                                    <option selected value="[% ci.ampm %]">[% ci.ampm %]</option>
+                                    [% IF ci.ampm == "AM" %]
+                                    <option value="PM">PM</option>
+                                    [% ELSE %]
+                                    <option value="AM">AM</option>
+                                    [% END %]
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="10" width="1">
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <td align="left" class="header_text">
+                                Event End Time:
+                            </td>
+                        </tr>
+                        [% CALL ci.switch_date(event.end_time) %] 
+                        <tr valign="top">
+                            <td>    
+                                <select name="to_month">
+                                    <option selected value="[% ci.month %]">[% ci.month %]</option>
+                                    [% FOREACH month = ci.nmonths %]
+                                    [% NEXT IF month == ci.month %]
+                                    <option value="[% month %]">[% month %]</option>
+                                    [% END %]
+                                </select>
+                                <font class="normal_text">/</font>
+                                <select name="to_day">
+                                    <option selected value="[% ci.day %]">[% ci.day %]</option>
+                                    [% FOREACH day = ci.ndays %]
+                                    [% NEXT IF day == ci.day %]
+                                    <option value="[% day %]">[% day %]</option>
+                                    [% END %]
+                                </select>
+                                <font class="normal_text">/</font>
+                                <select name="to_year">
+                                    <option selected value="[% ci.year %]">[% ci.year %]</option>
+                                    [% FOREACH year = ci.next_few_years %]
+                                    [% NEXT IF year == ci.year %]
+                                    <option value="[% year %]">[% year %]</option>
+                                    [% END %]
+                                </select>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="15">
+                                <font class="header_text">@</font>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="15">
+                                <select name="to_hour">
+                                    <option selected value="[% ci.hour %]">[% ci.hour %]</option>
+                                    [% FOREACH hour = ci.nhours %]
+                                    [% NEXT IF hour == ci.hour %]
+                                    <option value="[% hour %]">[% hour %]</option>
+                                    [% END %]
+                                </select>
+                                <font class="normal_text">:</font>
+                                <select name="to_minute">
+                                    <option selected value="[% ci.min %]">[% ci.min %]</option>
+                                    [% IF ci.min != "00" %]
+                                    <option value="00">00</option>
+                                    [% END %]
+                                    [% FOREACH min = ci.rmins %]
+                                    [% NEXT IF min == ci.min %]
+                                    <option value="[% min %]">[% min %]</option>
+                                    [% END %]
+                                </select>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="5">
+                                <select name="to_ampm">
+                                    <option selected value="[% ci.ampm %]">[% ci.ampm %]</option>
+                                    [% IF ci.ampm == "AM" %]
+                                    <option value="PM">PM</option>
+                                    [% ELSE %]
+                                    <option value="AM">AM</option>
+                                    [% END %]
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="10" width="1">
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <td align="left" class="header_text">
+                                Recur Until:
+                            </td>
+                        </tr>
+                        [% IF event.recur_until > 0 %]
+                            [% CALL ci.switch_date(event.recur_until) %]
+                        [% ELSE %]
+                            [% CALL ci.add_months(1) %]
+                        [% END %]
+                        <tr valign="top">
+                            <td>
+                                <select name="recur_month">
+                                    <option selected value="[% ci.month %]">[% ci.month %]</option>
+                                    [% FOREACH month = ci.nmonths %]
+                                    <option value="[% month %]">[% month %]</option>
+                                    [% END %]
+                                </select>
+                                <font class="normal_text">/</font>
+                                <select name="recur_day">
+                                    <option selected value="[% ci.day %]">[% ci.day %]</option>
+                                    [% FOREACH day = ci.ndays %]
+                                    <option value="[% day %]">[% day %]</option>
+                                    [% END %]
+                                </select>
+                                <font class="normal_text">/</font>
+                                <select name="recur_year">
+                                    <option selected value="[% ci.year %]">[% ci.year %]</option>
+                                    [% FOREACH year = ci.next_few_years %]
+                                    <option value="[% year %]">[% year %]</option>
+                                    [% END %]
+                                </select>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="15">
+                                <font class="header_text">@</font>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="15">
+                                <select name="recur_hour">
+                                    <option selected value="[% ci.hour %]">[% ci.hour %]</option>
+                                    [% FOREACH hour = ci.nhours %]
+                                    <option value="[% hour %]">[% hour %]</option>
+                                    [% END %]
+                                </select>
+                                <font class="normal_text">:</font>
+                                <select name="recur_minute">
+                                    <option selected value="00">00</option>
+                                    [% FOREACH min = ci.rmins %]
+                                    <option value="[% min %]">[% min %]</option>
+                                    [% END %]
+                                </select>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="5">
+                                <select name="recur_ampm">
+                                    <option selected value="[% ci.ampm %]">[% ci.ampm %]</option>
+                                    [% IF ci.ampm == "AM" %]
+                                    <option value="PM">PM</option>
+                                    [% ELSE %]
+                                    <option value="AM">AM</option>
+                                    [% END %]
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="10" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table width="100%" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td width="30%" class="header_text">
+                                            Event Place
+                                        </td>
+                                        <td width="30%" class="header_text">
+                                            Event Type
+                                        </td>
+                                        <td width="40%" class="header_text">
+                                            Recur Interval
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="30%">
+                                            <select name="place">
+                                                <option selected value="[% event.place %]">[% event.place %]</option>
+                                                [% FOREACH place = ci.list_event_places %]
+                                                [% NEXT IF place == event.place %]
+                                                    <option value="[% place %]">[% place %]</option>
+                                                [% END %]
+                                            </select>
+                                        </td>
+                                        <td width="30%">
+                                            <select name="type">
+                                                <option selected value="[% event.type %]">[% event.type %]</option>
+                                                [% FOREACH type = ci.list_event_types %]
+                                                [% NEXT IF type == event.type %]
+                                                <option value="[% type %]">[% type %]</option>
+                                                [% END %]
+                                            </select>
+                                        </td>
+                                        <td width="40%" class="normal_text">
+                                            [% split_interval = event.recur_interval_split %]
+                                            Every <input type="text" size="2" maxlength="3" name="recur_qty" class="normal_text" value="[% split_interval.0 %]">
+                                            <select name="recur_type">
+                                            [% IF event.recurring_event %]
+                                                <option selected value="[% ci.recur_intervals(split_interval.1) %]">[% ci.recur_intervals(ci.recur_intervals(split_interval.1)) %]</option>
+                                                [% FOREACH ri = ci.recur_intervals %]
+                                                    [% NEXT IF ri == ci.recur_intervals(split_interval.1) %]
+                                                    <option value="[% ri %]">[% ci.recur_intervals(ri) %]</option>
+                                                [% END %]
+                                            [% ELSE %]
+                                                <option selected value="day">Day(s)</option>
+                                                <option value="week">Week(s)</option>
+                                                <option value="month">Month(s)</option>
+                                            [% END %]
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="10" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="header_text">
+                                Short Description:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <textarea name="short_description" wrap="virtual" rows="2" cols="32">[% event.summary %]</textarea>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="20">
+                                <font class="normal_text">Make Event Public</font>
+                                <input type="checkbox" name="show_event" value="1" [% IF event.show_event %] checked [% END %]>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="10" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="header_text">
+                                Long Description:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <textarea cols="60" rows="8" name="description" wrap="virtual">[% event.description %]</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="10" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <font class="error_text">[% error.event %]</font><img src="../../theme_images/control_panel/nothing.gif" height="1" width="40"><a href="edit_event?id=[% event.id %]&delete=1" class="tiny_text">delete this event</a><img src="../../theme_images/control_panel/nothing.gif" height="1" width="40"><input type="submit" value="Submit" name="submit"><img src="../../theme_images/control_panel/nothing.gif" height="1" width="20">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr height="50%">
+                <td>
+                    &nbsp;
+                </td>
+            </tr>
+        </form>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

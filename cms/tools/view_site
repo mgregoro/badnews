@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+# $Id: view_site 428 2006-08-30 02:00:57Z corrupt $
+
+#
+# view_site
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+        tool_title          =>          'View My Site',
+        tool_name           =>          'view_site',
+        menu_position       =>          '_top, System',
+        description         =>          'View your website as it will be seen by others!',
+        tool_icon           =>          'tool_generic01.gif',
+        sufficient_flags    =>          ['s', 'a', 'u']
+    );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::ArticleInterface;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates", 
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $ai = BadNews::ArticleInterface->new();
+my $error = {};
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    # if we have a valid session...
+    if ($session) {
+        # determine if we have a specialized template file for this tool
+        my $template_file;
+        if (-e $c->CMS_PATH . "/templates/" . $this_tool->tool_name . ".tt2") {
+            $template_file = $this_tool->tool_name . ".tt2";
+        } else {
+            $template_file = "generic_tool.tt2";
+        }
+        print $q->header();
+        $tmpl->process($template_file, { self     =>       $this_tool,
+                                         site     =>       $ENV{SERVER_NAME}
+                                       });
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

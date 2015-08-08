@@ -1,0 +1,92 @@
+[% IF fe.cgi.param('filter_type') %]
+    [% filter_type = fe.cgi.param('filter_type') %]
+[% ELSE %]
+    [% filter_type = 'All' %]
+[% END %]
+<!-- $Id: news.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<html>
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>News Articles -- Archive</title>
+        <link href="style/ascscyo.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div class="logo_place">
+            <a href="/" border="0"><img border="0" src="/images/blue_logo_fp2.gif"></a>
+        </div>
+        <div class="overlay"></div>
+        <div class="left_column">
+            <div class="title_text">News Articles -- Archive</div>
+            <form name="article_type" action="/" method="post">
+                <input type="hidden" name="page" value="news">
+                Article Category Filter:&nbsp;&nbsp;<select name="filter_type" onChange="javascript:document.article_type.submit();">
+                    <option selected value="[% filter_type %]">[% filter_type %]</option>
+                    [% FOREACH type = fe.ai.list_categories %]
+                        [% NEXT IF type == filter_type %]
+                        <option value="[% type %]">[% type %]</option>
+                    [% END %]
+                    [% IF filter_type != "All" %]
+                        <option value="All">All</option>
+                    [% END %]
+                </select>
+            </form>
+            <div class="css_line"></div>
+            [% altrow = 0 %]
+            <table width="95%" border="0" class="normal_text">
+                <tr>
+                    <td width="100%">
+                        <table width="100%" border="0" class="normal_text">
+                            <tr>
+                                <td width="30%">
+                                    <b>Subject</b>
+                                </td>
+                                <td width="20%">
+                                    <b>Category</b>
+                                </td>
+                                <td width="20%">
+                                    <b>Author</b>
+                                </td>
+                                <td width="25%">
+                                    <b>Create Time</b>
+                                </td>
+                                <td width="5%">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            [% FOREACH article = fe.ai.articles_by_category(filter_type) %]
+                <tr>
+                    <td class="paltrow_[% altrow %]" width="100%">
+                        <table width="100%" border="0" class="normal_text">
+                            <tr>
+                                <td class="paltrow_[% altrow %]" width="30%">
+                                    [% article.subject %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="20%">
+                                    [% article.category %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="20%">
+                                    [% article.author %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="25%">
+                                    [% fe.ai.pretty_date(article.create_time) %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="5%">
+                                    <a href="/?page=article&article_id=[% article.id %]" target="_new" title="View article [% article.subject %]" border="0"><img src="/images/mag_glass.gif" alt="Open Article [% article.subject %]" border="0"></a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            [% IF altrow == 1 %]
+                [% altrow = 0 %]
+            [% ELSE %]
+                [% altrow = 1 %]
+            [% END %]
+            [% END %]
+            </table>
+        </div>
+    </body>
+</html>

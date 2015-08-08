@@ -1,0 +1,318 @@
+[% INCLUDE tool_top %]
+<!-- $Id: edit_article.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="95%" cellspacing="0" cellpadding="0" align="center">
+            <script language="javascript" type="text/javascript" src="../../tiny_mce/tiny_mce.js"></script>
+            <script language="javascript">
+
+            // define and populate the arrays used to keep the info :(
+                var imageUrl = new Array();
+                var imageShort = new Array();
+                var linkUrl = new Array();
+                var linkShort = new Array();
+                [% FOREACH img = ai.all_images %]
+                imageUrl[[% img.id %]] = "[% img.url %]";
+                imageShort[[% img.id %]] = "[% img.description %]";
+                [% END %]
+                [% FOREACH lnk = ai.all_links %]
+                linkUrl["l[% lnk.id %]"] = "[% lnk.url %]";
+                linkShort["l[% lnk.id %]"] = "[% lnk.short_name %]";
+                [% END %]
+                [% FOREACH file = ai.all_files %]
+                linkUrl["f[% file.id %]"] = "/files/[% file.name %]";
+                linkShort["f[% file.id %]"] = "[% file.name_short %]";
+                [% END %]
+                [% IF visual_editor_toggle %]
+                    tinyMCE.init ({
+                        theme : "advanced",
+                        mode : "exact",
+                        relative_urls : false,
+                        remove_script_host : false,
+                        add_form_submit_trigger : false,
+                        plugins : "fullscreen",
+                        theme_advanced_buttons3_add : "fullscreen",
+                        fullscreen_settings : {
+                            theme_advanced_path_location : "top"
+                        },
+                        elements : "body"
+                        });
+                [% END %]
+
+                //tinyMCE.updateContent(document.add_article.body);
+
+                function addImage(test)
+                {
+                    var file_id = document.add_article.add_image.options[document.add_article.add_image.selectedIndex].value;
+                    if (file_id) {
+                        tinyMCE.themes['advanced']._insertImage(imageUrl[file_id], imageShort[file_id]);
+                    }
+                    document.add_article.body.focus();
+                }
+
+                function addLink(test)
+                {
+                    var link_id = document.add_article.add_link.options[document.add_article.add_link.selectedIndex].value;
+                    if (link_id) {
+                        tinyMCE.themes['advanced']._insertLink(linkUrl[link_id], '_new')
+                    }
+                    document.add_article.body.focus();
+                }
+
+                function submitArticle() {
+                    [% IF visual_editor_toggle %]
+                        document.add_article.body.value = tinyMCE.getContent();
+                    [% END %]
+                    document.add_article.submit();
+                }
+
+            </script>
+            <tr>
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="15%" class="header_text" align="left">
+                                <form name="add_article" method="post" action="[% self %]" enctype="multipart/form-data">
+                                    <input type="hidden" name="id" value="[% article.id %]">
+                                Subject:
+                            </td>
+                            <td width="85%" align="left">
+                                <input type="text" size="38" maxlength="255" name="subject" value="[% article.subject %]">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="15%" class="header_text" align="left">
+                                Category:
+                            </td>
+                            <td width="50%" align="left">
+                                <select name="category">
+                                    <option selected value="[% article.category %]">[% article.category %]</option>
+                                    [% FOREACH category = ai.list_categories %]
+                                    [% NEXT IF category == article.category %]
+                                    <option value="[% category %]">[% category %]</option>
+                                    [% END %]
+                                </select>
+                            </td>
+                            [% IF user_can_publish %]
+                            <td width="20%" class="header_text" align="left">
+                                Publish Article: <img src="../../theme_images/control_panel/nothing.gif" height="1" width="3">
+                            </td>
+                            <td width="15%" align="left">
+                                [% IF article.published %]
+                                    <input type="checkbox" value="1" name="published" checked>
+                                [% ELSE %]
+                                    <input type="checkbox" value="1" name="published">
+                                [% END %]
+                            </td>
+                            [% ELSE %]
+                            <td colspan="2">&nbsp;</td>
+                            [% END %]
+                        </tr>
+                        <tr>
+                            <td width="60%" colspan="2">
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                            </td>
+                            <td width="25%" class="header_text" align="left">
+                                Enable Comments: <img src="../../theme_images/control_panel/nothing.gif" height="1" width="3">
+                            </td>
+                            <td width="15%" align="left">
+                                <input type="checkbox" value="1" name="enable_comments" [% IF article.enable_comments %] checked [% END %]>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr valign="bottom">
+                            <td width="70%" align="left">
+                                Body:<br>
+                                [% IF visual_editor_toggle %]
+                                <a class="tiny_text" href="?visual_editor_toggle=0&id=[% article.id %]" title="turn visual editor off">turn visual editor <b>off</b></a>
+                                [% ELSE %]
+                                <a class="tiny_text" href="?visual_editor_toggle=1&id=[% article.id %]" title="turn visual editor on">turn visual editor <b>on</b></a>
+                                [% END %]
+                                <span class="tiny_text"> | 
+                                [% IF upload_body %]
+                                    <a class="tiny_text" href="?visual_editor_toggle=1&id=[% article.id %]&upload_body=0" title="type in body">type in body</a>
+                                    <input type="hidden" name="upload_body" value="1">
+                                [% ELSE %]
+                                    <a class="tiny_text" href="?visual_editor_toggle=0&id=[% article.id %]&upload_body=1" title="upload body">upload body</a>
+                                [% END %]
+                            </td>
+                            <td width="30%" align="left">
+                                Associated Files:
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <td width="70%" align="left">
+                            [% IF upload_body %]
+                                <input type="file" name="body" size="30">
+                            [% ELSE %]
+                                [% IF nibr_body %]
+                                    <textarea name="body" rows="12" cols="60">[% nibr_body %]</textarea>
+                                [% ELSE %]
+                                    <textarea name="body" rows="12" cols="60">[% article.body %]</textarea>
+                                [% END %]
+                            [% END %]
+                            </td>
+                            <td width="30%" align="left">
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td>
+                                            <select name="associated_files" multiple size="4">
+                                                [% FOREACH file = ai.all_files %]
+                                                    [% IF article.file_is_associated(file.id) %]
+                                                        <option value="[% file.id %]" selected>[% file.name_short %]</option>
+                                                    [% ELSE %]
+                                                        <option value="[% file.id %]">[% file.name_short %]</option>
+                                                    [% END %]
+                                                [% END %]
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img src="../../theme_images/control_panel/nothing.gif" height="3" width="1">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="header_text">
+                                            Associated Links:
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <select name="associated_links" multiple size="4">
+                                                [% FOREACH link = ai.all_links %]
+                                                    [% IF article.link_is_associated(link.id) %]
+                                                        <option value="[% link.id %]" selected>[% link.name_short %]</option>
+                                                    [% ELSE %]
+                                                        <option value="[% link.id %]">[% link.name_short %]</option>
+                                                    [% END %]
+                                                [% END %]
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td class="header_text" width="50%" align="left">
+                                Add Image To Text:
+                            </td>
+                            <td class="header_text" width="50%" align="left">
+                                Turn Selection To Link:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select name="add_image">
+                                    [% FOREACH image = ai.all_images %]
+                                    <option value="[% image.id %]">[% image.name_short %]</option>
+                                    [% END %]
+                                </select>
+                                <input type="button" value="Add Image" onClick="addImage();">
+                            </td>
+                            <td>
+                                <select name="add_link">
+                                <optgroup label="Links">
+                                    [% FOREACH link = ai.all_links %]
+                                        <option value="l[% link.id %]">[% link.name_short %]</option>
+                                    [% END %]
+                                </optgroup>
+                                <optgroup label="Files">
+                                    [% FOREACH file = ai.all_files %]
+                                        <option value="f[% file.id %]">[% file.name_short %]</option>
+                                    [% END %]
+                                </optgroup>
+                                </select>
+                                <input type="button" value="Make Link" onClick="addLink();">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="20" width="1">
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    [% IF enable_spellchk %]
+                    <!--    WBOSS http://www.dontpokebadgers.com/spellchecker/ !-->
+                    <form name="spell">
+                            <script>
+                            function sendtext()
+                                    {
+                                    var semi = new RegExp("\;","g");
+                                    document.add_article.body.value = tinyMCE.getContent();
+                                    document.send.checkme.value = (document.add_article.body.value.replace(semi,"\;"));
+                                    document.send.form.value = "add_article";
+                                    document.send.field.value = "body";
+                                    window.open('','SpellChecker',
+                                    'width=480,height=320,top=150,left=150,scrollbars=1,location=true');
+                                    document.send.submit();
+                                    }
+                            </script>
+                    </form>
+                    <form name="send" action="[% fe.bn_location %]/spellchk" method="POST" target="SpellChecker">
+                        <input type="hidden" name="checkme">
+                        <input type="hidden" name="form">
+                        <input type="hidden" name="field">
+                        <input type="hidden" name="spell" value="check">
+                    </form>
+                    <input type="button" name="SpellCheck" value="Check Spelling" onclick="sendtext()">
+                    <img src="../images/nothing.gif" height="1" width="10">
+                    <!--    END WBOSS http://www.pokebadgers.com/spellchecker/ -->
+                    [% END %]
+                    <input type="button" value="Submit" onClick="submitArticle()"><img src="../../theme_images/control_panel/nothing.gif" height="1" width="25">
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <font class="error_text">[% error.add_article %]</font>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <script language="javascript">
+        document.add_article.subject.focus();
+    </script>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

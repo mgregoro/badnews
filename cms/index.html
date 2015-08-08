@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+# $Id: index.html 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+use CGI;
+
+my $q = new CGI;
+
+print $q->redirect('tools/login');

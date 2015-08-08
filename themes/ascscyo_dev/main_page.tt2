@@ -1,0 +1,222 @@
+<html>
+<!-- $Id: main_page.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>Blue Thunder!  All Saints Catholic School CYO</title>
+        <link href="style/ascscyo.css" rel="stylesheet" type="text/css">
+    </head>
+    <script language="javascript">
+        function pop_open_event(url, arg1, arg2)
+        {
+            var gUrl = url + '?page=' + arg1 + '&event_id=' + arg2;
+            window.open(gUrl, "event" + arg2, "width=540,height=380,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+        function pop_open_daycal(url, arg1, arg2, arg3, arg4)
+        {
+            var gUrl = url + '?page=' + arg1 + '&day=' + arg2 + '&month=' + arg3 + '&year=' + arg4;
+            window.open(gUrl, "daycal" + arg2 + arg3 + arg4, "width=640, height=480,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+    </script>
+    <body>
+        <div class="logo_place">
+            <img src="/images/blue_logo_fp2.gif">
+        </div>
+        <div class="watermark_place">
+            <img src="/images/ascs_watermark.gif">
+        </div>
+        <div class="overlay"></div>
+                <div class="address_place">All Saints Catholic School - 48735 Warren Road Canton, MI 48187</div>
+        <div class="left_column">
+                <div class="box_frame">
+                    <div class="s1">
+                    <div class="box_title">Site Navigation</div>
+                    <div class="box_box">
+                        <!--
+                        <a href="/?page=main_page" title="Main Page"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">Main Page</div></a>
+                        <a href="/?page=files" title="File Archive - Download Files"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">File Archive</div></a>
+                        <a href="/?page=news" title="News"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">News Articles</div></a>
+                        <a href="/?page=calendar" title="Upcoming Events"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">Calendar</div></a>
+                        <a href="/?page=about" title="About ASCSCYO"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">About Us</div></a>
+                        <a href="/?page=contact" title="Contact Us!"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">Contact Us</div></a>
+                        <a href="/?page=links" title="Links of interest"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">Links</div></a>
+                        -->
+                        [% FOREACH link = fe.links_by_cat('[SYS] Navigation') %]
+                            <a href="[% link.url %]" title="[% link.long_name %]"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">[% link.short_name %]</div></a>
+                        [% END %]
+                    </div>
+                    </div>
+                </div>
+            <br>
+            <div class="box_frame">
+                <div class="s1">
+                <div class="box_title">Recent News</div>
+                <div class="box_box">
+                    [% i = 0 %]
+                    [% narticle = fe.ai.count_recent_articles(5, 3) %]
+                    [% FOREACH article = fe.ai.recent_articles(5, 3) %]
+                    [% i = i + 1 %]
+                    <a href="/?page=article&article_id=[% article.id %]" target="_new" title="open article '[% article.subject %]'"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">[% article.subject %]<br><div style="font-size: 10px" align="right">[% article.author %]<br>[% fe.ai.pretty_date(article.create_time) %]</div></div></a>
+                        [% UNLESS i == narticle %]
+                            <div class="box_spacer"></div>
+                        [% END %]
+                    [% END %]
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="center_column">
+            [% FOREACH article = fe.ai.recent_articles(3, 0, modify) %]
+            <div class="centerbox">
+                [% author = fe.author_by_name(article.author) %]
+                <div class="title_text">[% article.subject %]</div>
+                <!-- requested removal by mary starr mary@ascscyo.org
+                <div class="header_text">Created By: [% author.common_name %]</div>
+                -->
+                <div class="css_line"></div>
+                <!-- <p class="normal_text">[% article.ucfirst_body('<span class="cap">', '</span>') %]</p> -->
+                <p class="normal_text">[% article.body %]</p>
+                <br>
+                [% IF article.files && article.links %]
+                    <!-- do associated files -->
+                    <table width="100%" border="0" valign="top">
+                        <tr valign="top">
+                            <td width="10%">
+                                &nbsp;
+                            </td>
+                            <td align="left" width="39%">
+                                <div class="header_text">Associated Files</div>
+                                <ul class="normal_text">
+                                    [% FOREACH file = article.files %]
+                                        <li>
+                                        <a href="/files/[% file.name %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="Download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a>
+                                        </li>
+                                    [% END %]
+                                </ul>
+                            </td>
+                            <td width="2%">
+                                &nbsp;
+                            </td>
+                            <td align="left" width="39%">
+                                <div class="header_text">Associated Links</div>
+                                <ul class="normal_text">
+                                    [% FOREACH link = article.links %]
+                                        <li>
+                                            <a href="[% link.url %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="[% link.long_name %]" target="_new">[% link.short_name %]</a>
+                                        </li>
+                                    [% END %]
+                                </ul>
+                            </td>
+                            <td width="10%">
+                                &nbsp;
+                            </td>
+                        </tr>
+                    </table>
+                [% ELSIF article.links %]
+                    <div class="header_text">Associated Links</div>
+                    <ul>
+                        [% FOREACH link = article.links %]
+                        <li>
+                            <a href="[% link.url %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="[% link.long_name %]" target="_new">[% link.short_name %]</a>
+                        </li>
+                        [% END %]
+                    </ul>
+                [% ELSIF article.files %]
+                    <div class="header_text">Associated Files</div>
+                    <ul>
+                        [% FOREACH file = article.files %]
+                        <li>
+                            <a href="/files/[% file.name %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="Download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a>
+                        </li>
+                        [% END %]
+                    </ul>
+                [% END %]
+            </div>
+            <br>
+            <div class="normal" align="center">Last Modified: [% fe.ci.dim_to_short(article.modify_time) %]</div>
+            <br>
+            [% END %]
+            <br>
+            <div class="normal" align="center">For information about this website contact: <a href="mailto:mary@ascscyo.org">mary@ascscyo.org</a>.</div>
+            <br>
+        </div>
+        <div class="right_column">
+            [% i = 0 %]
+            [% calendar = fe.draw_calendar(fe.cgi.param('calendar_month'), fe.cgi.param('calendar_year')) %]
+            <div class="box_frame">
+            <div class="s1">
+            <div class="box_title">
+                <a href="/?calendar_month=[% calendar.last_month %]&calendar_year=[% calendar.last_month_year %]" title="Go to previous month">&lt;&lt;</a>&nbsp;&nbsp;[% calendar.month %] [% calendar.year %]&nbsp;&nbsp;<a href="/?calendar_month=[% calendar.next_month %]&calendar_year=[% calendar.next_month_year %]" title="Go to future month">&gt;&gt;</a>
+            </div>
+            <div class="box_title">
+                <table width="100%" border="0">
+                    <tr>
+                        <td align="center">
+                            <font style="font-size: 12px">Su</font>
+                        </td>
+                        <td align="center">
+                            <font style="font-size: 12px">Mo</font>
+                        </td>
+                        <td align="center">
+                            <font style="font-size: 12px">Tu</font>
+                        </td>
+                        <td align="center">
+                            <font style="font-size: 12px">We</font>
+                        </td>
+                        <td align="center">
+                            <font style="font-size: 12px">Th</font>
+                        </td>
+                        <td align="center">
+                            <font style="font-size: 12px">Fr</font>
+                        </td>
+                        <td align="center">
+                            <font style="font-size: 12px">Sa</font>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="box_box">
+                <table width="100%" border="0">
+                    <tr>
+                    [% FOREACH day = calendar.days %]
+                        [% NEXT IF day == 1 %]
+                        [% IF day %]
+                            [% IF day.is_today %]
+                                <td align="center" style="background: #012778; color: #FFFFFF"><a style="background: #012778; color: #FFFFFF; font-size: 12px" href="javascript:pop_open_daycal('/', 'calendar_day', '[% day.day %]', '[% day.month %]', '[% day.year %]')" title="View events for [% day.month %]/[% day.day %]/[% day.year %] (Today)" onMouseOver="this.style.backgroundColor='#7F8EAB'; this.style.color='#000000';" onMouseOut="this.style.backgroundColor='#012778'; this.style.color='#FFFFFF';">[% day.single_day %]</a></td>
+                            [% ELSE %]
+                                <td align="center"><a style="font-size: 12px" href="javascript:pop_open_daycal('/', 'calendar_day', '[% day.day %]', '[% day.month %]', '[% day.year %]')" title="View events for [% day.month %]/[% day.day %]/[% day.year %]" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">[% day.single_day %]</a></td>
+                            [% END %]
+                        [% ELSE %]
+                            <td>&nbsp;&nbsp;</td>
+                        [% END %]
+
+                        [% i = i + 1 %]
+                        
+                        [% IF (i == 7 or i == 14 or i == 21 or i == 28) %]
+                            </tr><tr>
+                        [% ELSIF i == 35 %]
+                            </tr>
+                        [% END %]
+                    [% END %]
+                </table>
+            </div>
+        </div>
+        </div>
+        <br>
+        <div class="box_frame">
+            <div class="s1">
+                <div class="box_title">Upcoming Events</div>
+                <div class="box_box">
+                    [% i = 0 %]
+                    [% nevents = fe.ci.count_upcoming_events(5) %]
+                    [% FOREACH event = fe.ci.upcoming_events(5) %]
+                    [% i = i + 1 %]
+                    <a href="javascript:pop_open_event('/', 'view_event', '[% event.id %]')" title="View event [% event.summary %]"><div class="box_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'">[% event.summary %] @ [% event.place %]<br><div style="font-size: 10px" align="right">[% event.type %]<br>Starts:&nbsp;[% fe.ci.dim_to_short(event.start_time) %]<br>Ends:&nbsp;[% fe.ci.dim_to_short(event.end_time) %]<br></div></div></a>
+                        [% UNLESS i == nevents %]
+                            <div class="box_spacer"></div>
+                        [% END %]
+                    [% END %]
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

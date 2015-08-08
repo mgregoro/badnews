@@ -1,0 +1,5 @@
+[% BLOCK footer %]
+<!-- $Id: footer.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    </body>
+</html>
+[% END %]

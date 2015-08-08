@@ -1,0 +1,153 @@
+[% paged = fe.param('paged') %]
+[% UNLESS paged %]
+    [% paged = 1 %]
+[% END %]
+[% display_articles = 5 %]
+[% skip_articles = (paged - 1) * display_articles %]
+[% limit_string = "limit " _ skip_articles _ ", " _ display_articles %]
+[% next_limit_string = "limit " _ (skip_articles + 5) _ ", " _ display_articles %]
+[% IF fe.param('s') %]
+    [% search_string = fe.param('s') %]
+[% ELSE %]
+    [% search_string = 'all' %]
+[% END %]
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head profile="http://gmpg.org/xfn/11">
+  <title>[% fe.config.APP_TITLE %] - Search: [% search_string %]</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="generator" content="BadNews 0.12b" /> <!-- leave this for stats please -->
+  <script src="/page/js_quicktags_mini/" type="text/javascript"></script>
+
+  <style type="text/css" media="screen">
+   @import url( /style/rin.css );
+  </style>
+  <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="/rss/rss.xml" />
+ </head>
+
+ <body>
+  <a name =" top"></a>
+  <div id="hnav">
+   <div id="hmenu"> 
+    <ul id="top"> 
+     <li><a href="http://mike.mg2.org/article/docs/%5BSYS%5D%20About%20Me/">about</a></li>
+     <li><a href="http://mike.mg2.org/article/software/mg2bot/">mg2bot</a></li>
+     <li><a href="[% fe.bn_location %]/random/">random</a></li>
+     <li><a href="http://mike.mg2.org/resume/">resume</a></li>
+     <li><a href="#bottom" title="search in previous posts">search</a></li>
+     <li><a href="/cms/tools/login">Login</a></li>
+    </ul>
+   </div>
+   <div id="header">
+    <h1 id="blogtitle">
+     <a href="/">[% fe.config.APP_TITLE %]</a>
+    </h1>
+   </div>
+  </div> <!-- Closes the hnav div-->
+ <div id="masthead" onclick="location.href='/';" style="cursor: pointer;">
+
+     </div> 
+    <br/>
+    <script type="text/javascript"><!--
+    google_ad_client = "pub-3179036797838936";
+    google_ad_width = 728;
+    google_ad_height = 90;
+    google_ad_format = "728x90_as";
+    google_ad_type = "text_image";
+    google_ad_channel ="";
+    google_color_border = "d9d7da";
+    google_color_bg = "FFFFFF";
+    google_color_link = "005D93";
+    google_color_text = "000000";
+    google_color_url = "008000";
+    //--></script>
+    <script type="text/javascript"
+      src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+    </script>
+     <div id="container">
+  <div id="topcontent"></div>
+  <div id="singlecontent">
+   <div class="clearer"> </div>
+   <div class="singlepost">
+       <h2 class="searchresult">Search - ([% search_string %])</h2>
+       [% search_count = fe.ai.count_articles_by_search_string(search_string) %]
+       [% IF search_count > 0 %]
+          <div class="searchdetails">
+              [% IF display_articles >= search_count %]
+                  Search results for [% search_string %] ([% skip_articles + 1 %] - [% search_count %] of [% search_count %])
+              [% ELSE %]
+                  [% IF display_articles + skip_articles >= search_count %]
+                      Search results for [% search_string %] ([% skip_articles + 1 %] - [% search_count %] of [% search_count %])
+                  [% ELSE %]
+                      Search results for [% search_string %] ([% skip_articles + 1 %] - [% skip_articles + display_articles %] of [% search_count %])
+                  [% END %]
+              [% END %]
+        </div>
+        [% FOREACH article = fe.ai.articles_by_search_string(search_string, limit_string, "order by create_time desc") %]
+           <h2 class="searchresult">
+               <a href="/article/archived/[% article.id %]/" rel="bookmark" title="Permanent Link to [% article.subject %]">
+               [% article.subject %]</a>
+       </h2>
+       <div class="searchinfo">
+           ( <a href="/category/[% article.category %]/" title="View all posts in [% article.category %]" rel="category tag">[% article.category %]</a> ) 
+           [ [% FOREACH tag = fe.ti.tags('article', article.id) %]
+               <a href="/tagged/[% tag.name %]/" title="View all posts tagged with [% tag.name %]">[% tag.name %]</a>
+               [% UNLESS tag.is_last %]
+                  /
+               [% END %]
+             [% END %]
+           ]
+       </div>
+
+       <div class="clearer"> </div>
+       <p>[% fe.ai.truncate(article, 'body', '512', 1) %]
+</p>
+       <div class="searchinfo">
+        <a href="/article/archived/[% article.id %]/" rel="bookmark" title="Permanent Link to [% article.subject %]">
+         (to view associated entry please click here)</a>
+
+       </div>
+        [% END %]
+    [% ELSE %]
+        <div class="search_details">
+            Sorry, No results were found for "[% search_string %]"
+        </div>
+    [% END %]
+  </div> <!-- This closes the singlepost div-->
+   <div class="postnavigation">
+    <div class="right">
+        [% IF fe.ai.previous_posts_by_search_string(search_string, next_limit_string) %]
+            <a href="/?page=[% fe.param('page') %]&s=[% search_string %]&paged=[% paged + 1 %]">previous posts + &#187;</a>
+        [% END %]
+    </div>
+    <div class="left">
+        [% IF paged > 1 %]
+            <a href="/?page=[% fe.param('page') %]&s=[% search_string %]&paged=[% paged - 1 %]">&#171; + newer posts</a>
+        [% END %]        
+    </div>
+   </div>
+   <div id="bottomcontent"> </div>
+  </div> <!-- This closes the content div-->
+ </div> <!-- This closes the container div-->
+<a name =" bottom"></a>
+<div id="footer">
+ <div id="menu">
+  <form id="searchform" method="get" action="/">
+   <input type="hidden" name="page" value="search">
+   <input id="searchbutton" type="submit" name="submit" value="Search" />
+   <input type="text" name="s" id="search" size="25" />
+  </form> 
+ <div id="topimage"> 
+  <a href="#"></a>  
+ </div>
+</div>
+<p class="credits"><a href="http://mike.mg2.org">mike.mg2.org</a> is &copy; 2006 Michael Gregorowicz.<br>
+<a href="http://www.brokenkode.com/manji">Rin</a> by Khaled Abou Alfa and Joshua. <br>
+Powered By <a href="http://bndev.mg2.org">[% fe.pretty_version %]</a><br>
+I thought about this page for [% fe.time_taken %] seconds.
+ </p>
+ <p class="wordpress"></p>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+# $Id: menu 428 2006-08-30 02:00:57Z corrupt $
+
+#
+# the login script - sets session information!
+#
+use lib("../../lib");
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'Menu',
+                tool_name           =>          'menu',
+                description         =>          'Menu interface to the system',
+                menu_position       =>          '_none',
+                sufficient_flags    =>          []
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use FreezeThaw qw(freeze thaw);
+use BadNews::Session;
+use BadNews::ToolRegistry::Menu;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2)],
+                         TRIM           =>      1});
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id  =>      $session_id);
+    if ($session) {
+        my $menu;
+        if ($session->frozen_menu) {
+            print $q->header();
+            if (time - $session->menu_age > $c->TOOL_REGISTRY_UPDATE_TIME) {
+                # cache is expired
+                $menu = BadNews::ToolRegistry::Menu->new(tool_registry       =>      $bn->tr,
+                                                         user                =>      $session->bnuser);
+                $session->frozen_menu(freeze($menu));
+                $session->menu_age(time);
+            } else {
+                ($menu) = thaw($session->frozen_menu);
+            }
+        } else {
+            $menu = BadNews::ToolRegistry::Menu->new(tool_registry       =>      $bn->tr, 
+                                                     user                =>      $session->bnuser);
+            $session->frozen_menu(freeze($menu));
+            $session->menu_age(time);
+        }
+        print $q->header();
+        $tmpl->process('menu.tt2', { title      =>      $c->APP_TITLE, error    =>      $error,
+                                     version    =>      $c->SYS_VERSION, 
+                                     menu       =>      $menu, cgi      =>      $q });
+    } else {
+        print $q->redirect('../index.html');
+    }
+} else {
+    print $q->redirect('../index.html');
+}

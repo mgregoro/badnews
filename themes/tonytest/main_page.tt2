@@ -1,0 +1,30 @@
+<html>
+<!-- $Id: main_page.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+        <title>simple test</title>
+        <link href="/style/mg2.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <table>
+        [% FOREACH article = fe.ai.recent_articles(5) %]
+            <tr>
+                <td align="left">
+                    [% article.subject %]
+                </td>
+                <td align="left">
+                    [% article.author %]
+                </td>
+                <td align="left">
+                    [% fe.ai.pretty_date(article.create_time) %]
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    [% article.body %]
+                </td>
+            </tr>
+            <tr><td colspan="3">&nbsp;</td></tr>
+        [% END %]
+        </table>
+    </body>
+</html>

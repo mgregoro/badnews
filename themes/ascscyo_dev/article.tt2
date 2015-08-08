@@ -1,0 +1,88 @@
+[% IF fe.cgi.param('article_id') %]
+    [% article = fe.ai.open_article(fe.cgi.param('article_id')) %]
+[% ELSIF fe.cgi.param('article_category') %]
+    [% article = fe.ai.articles_by_category(fe.cgi.param('article_category'), 'create', 1) %]
+[% END %]
+[% author = fe.author_by_name(article.author) %]
+<!-- $Id: article.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<html>
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>[% article.subject %]</title>
+        <link href="style/ascscyo.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div class="logo_place">
+            <a href="/" border="0"><img border="0" src="/images/blue_logo_fp2.gif"></a>
+        </div>
+        <div class="watermark_place">
+            <img src="/images/ascs_watermark.gif">
+        </div>
+        <div class="overlay"></div>
+        <div class="solo_article">
+            <div class="title_text">[% article.subject %]</div>
+            <!-- removed per Mary Starr's request mary@ascscyo.org
+            <div class="header_text">Created By: [% author.common_name %]</div>
+            -->
+            <div class="css_line"></div>
+            <p class="normal_text">[% article.body %]</p>
+            <br>
+             [% IF article.files && article.links %]
+                <!-- do associated files -->
+                <table width="100%" border="0" valign="top">
+                    <tr valign="top">
+                        <td width="10%">
+                            &nbsp;
+                        </td>
+                        <td align="left" width="39%">
+                            <div class="header_text">Associated Files</div>
+                            <ul class="normal_text">
+                                [% FOREACH file = article.files %]
+                                    <li>
+                                        <a href="/files/[% file.name %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="Download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a> 
+                                    </li>
+                                [% END %]
+                            </ul>
+                        </td>
+                        <td width="2%">
+                            &nbsp;
+                        </td>
+                        <td align="left" width="39%">
+                            <div class="header_text">Associated Links</div>
+                            <ul class="normal_text">
+                                [% FOREACH link = article.links %]
+                                    <li>
+                                        <a href="[% link.url %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="[% link.long_name %]" target="_new">[% link.short_name %]</a> 
+                                    </li>
+                                [% END %]
+                            </ul>
+                        </td>
+                        <td>
+                            &nbsp;
+                        </td>
+                    </tr>
+                </table>
+            [% ELSIF article.links %]
+                <div class="header_text">Associated Links</div>
+                <ul>
+                    [% FOREACH link = article.links %]
+                    <li>
+                        <a href="[% link.url %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="[% link.long_name %]" target="_new">[% link.short_name %]</a> 
+                    </li>
+                    [% END %]
+                </ul>
+            [% ELSIF article.files %]
+                <div class="header_text">Associated Files</div>
+                <ul>
+                    [% FOREACH file = article.files %]
+                    <li>
+                        <a href="/files/[% file.name %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="Download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a> 
+                    </li>
+                    [% END %]
+                </ul>
+            [% END %]
+            <br>
+        <div class="normal" align="right">Last Modified: [% fe.ci.dim_to_short(article.modify_time) %]</div>
+        </div>
+    </body>
+</html>

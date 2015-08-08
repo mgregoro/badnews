@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+use lib('../../lib');
+
+#
+# edit_file_associations
+#
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::Article;
+use BadNews::File;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->TEMPLATE_PATH,
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $error = {};
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        print $q->header();
+        $tmpl->process('edit_file_associations.tt2', { title     =>      'Edit File Associations',
+                                          error     =>      $error,
+                                          tool_name =>      'Edit File Associations',
+                                          tool_icon =>      '/images/edit_file_associations.gif' });
+        exit();
+    } else {
+        print $q->redirect('/cms/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('/cms/login');
+    exit();
+}

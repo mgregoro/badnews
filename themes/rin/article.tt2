@@ -1,0 +1,387 @@
+[% PROCESS 'rin/icon_frame.tt2' %]
+[% date_format = "%A %d {month long} %Y" %]
+[% time_format = "%k:%M %P" %]
+[% comment_format = "{month long} %d, %Y" %]
+[% IF fe.cgi.param('article_id') %]
+    [% article = fe.ai.open_article(fe.cgi.param('article_id')) %]
+[% ELSIF fe.cgi.param('article_category') %]
+    [% article = fe.ai.articles_by_category(fe.cgi.param('article_category'), 'create', 1) %]
+[% END %]
+[% prev_article = article.prev_by_create %]
+[% next_article = article.next_by_create %]
+[% IF article %]
+    [% author = fe.author_by_name(article.author) %]
+[% END %]
+[% IF fe.param('comment') %]
+    [% c_article_id = fe.param('c_article_id') %]
+    [% article = fe.ai.open_article(c_article_id) %]
+    [% comment_id = article.add_comment(fe.param('name'), fe.param('url'), fe.ai.parse_body(fe.param('comment'), 1), fe.param('irt'), fe.param('subject'), fe.session) %]
+    [% comment_name = fe.anon_session.comment_name(fe.param('name')) %]
+    [% comment_url = fe.anon_session.comment_url(fe.param('url')) %]
+[% ELSE %]
+    [% comment_name = fe.anon_session.comment_name %]
+    [% comment_url = fe.anon_session.comment_url %]
+[% END %]
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml">
+ <head profile="http://gmpg.org/xfn/11">
+  <title>[% fe.config.APP_TITLE %] - [% article.subject %]</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="generator" content="BadNews 0.12b" /> <!-- leave this for stats please -->
+  <script src="/page/js_quicktags_mini/" type="text/javascript"></script>
+  <style type="text/css" media="screen">
+   @import url( /style/rin.css );
+  </style>
+  <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="/rss/rss.xml" />
+  <script type="text/javascript" src="[% fe.bn_location %]/js/json.js"></script>
+  <script type="text/javascript" src="[% fe.bn_location %]/js/prototype.js"></script>
+  <script type="text/javascript" src="[% fe.bn_location %]/js/scriptaculous.js"></script>
+  <script language="javascript" type="text/javascript">
+      var base_url = '[% fe.bn_location %]';
+      var req;
+      var to_load = new Array;
+
+      function load_tags(article_id, uncached) {
+          var url;
+          if (uncached) {
+              url = base_url + '/tags/article/' + article_id + '/?no_cache=1';
+          } else {
+              url = base_url + '/tags/article/' + article_id + '/';
+          }
+
+          // don't make a new request until the last one has finished processing
+          if (req) {
+              if (req.readyState < 4) {
+                  // wait 1/10th a second..
+                  setTimeout('load_tags(' + article_id + ');', 100);
+                  return true;
+              }
+          }
+          
+          if (window.XMLHttpRequest) {
+              req = new XMLHttpRequest();
+              req.onreadystatechange = update_tag_html;
+              req.open("GET", url, true);
+              req.send(null);
+              // branch for IE/Windows ActiveX version
+          } else if (window.ActiveXObject) {
+              req = new ActiveXObject("Microsoft.XMLHTTP");
+              if (req) {
+                  req.onreadystatechange = update_tag_html;
+                  req.open("GET", url, true);
+                  req.send();
+              }
+          }
+      }
+
+      function update_tag_html (article_id) {
+          if (req.readyState == 4) {
+              if (req.status == 200) {
+                  var tags = req.responseText.parseJSON();
+
+                  // get the entity id from the response header so i can create the tag box.
+                  var article_id = req.getResponseHeader('X-bN-Tag-Entity');
+                  var tag_box = document.getElementById('tag_' + article_id);
+
+                  if (tags.length > 0) {
+                      // get the ent_id from the JSON so we know where to put the tags..
+                      tag_box.innerHTML = '<a href="[% fe.bn_location %]/tagged/' + tags[0].name + 
+                          '/" title="other articles tagged with ' + 
+                          tags[0].name + '" style="font-size: ' + 
+                          (8 + tags[0].count / 2) + 'px;">' + tags[0].name + '</a>';
+
+                      // iterate through the rest of the tags..
+                      for (i = 1; i < tags.length; i++) {
+                          tag_box.innerHTML = tag_box.innerHTML + ' / <a href="[% fe.bn_location %]/tagged/' + 
+                              tags[i].name + '/" title="other articles tagged with ' +
+                              tags[i].name + '" style="font-size: ' +
+                              (8 + tags[i].count / 2) + 'px;">' + tags[i].name + '</a>'; 
+                      }
+                  } else {
+                      tag_box.innerHTML = '&nbsp;';
+                  }
+              }
+          }
+      }
+      
+      function refresh_tags() {
+          if (req.readyState == 4) {
+              if (req.status == 200) {
+                  var article_id = req.getResponseHeader('X-bN-Tag-Entity');
+                  // the second argument should load it uncached by appending ?no_cache=1
+                  load_tags(article_id, 1);
+              }
+          }
+      }
+      
+      function submit_tag(article_id) {
+          var tag_name = document.getElementById('tag-form_' + article_id).tag_name.value;
+          var url = base_url + '/tag/article/' + article_id + '/?tag_name=' + tag_name;
+
+          if (window.XMLHttpRequest) {
+              req = new XMLHttpRequest();
+              req.onreadystatechange = refresh_tags;
+              req.open("GET", url, true);
+              req.send(null);
+              // branch for IE/Windows ActiveX version
+          } else if (window.ActiveXObject) {
+              req = new ActiveXObject("Microsoft.XMLHTTP");
+              if (req) {
+                  req.onreadystatechange = refresh_tags;
+                  req.open("GET", url, true);
+                  req.send();
+              }
+          }
+      }
+
+      function show_add_tag(article_id) {
+          var tag_box = document.getElementById('tag_' + article_id);
+          tag_box.innerHTML = '<form id="tag-form_' + article_id + '" name="tag-form_' + article_id + '");" onSubmit="submit_tag(\'' + article_id + '\'); return false;">' +
+              '<input type="text" size="15" class="tag_form" name="tag_name">&nbsp;&nbsp;' + 
+              '<input type="button" value="Tag!" onClick="submit_tag(\'' + article_id + '\');">&nbsp;&nbsp;' +
+              '<input type="button" value="Cancel" onClick="load_tags(\'' + article_id + '\');"></form>';
+          document.getElementById('tag-form_' + article_id).tag_name.focus();
+      }
+
+      // do what we need to do
+      function load_to_load() {
+          for (i = 0; i < to_load.length; i++) {
+              load_tags(to_load[i]);
+          }
+      }
+
+  </script>
+ </head>
+
+ <body onLoad="load_to_load()">
+  <a name = "top"></a>
+  <div id="hnav">
+   <div id="hmenu"> 
+    <ul id="top"> 
+     <li><a href="http://mike.mg2.org/article/docs/%5BSYS%5D%20About%20Me/">about</a></li>
+     <li><a href="http://mike.mg2.org/article/software/mg2bot/">mg2bot</a></li>
+     <li><a href="[% fe.bn_location %]/random/">random</a></li>
+     <li><a href="http://mike.mg2.org/resume/">resume</a></li>
+     <li><a href="#bottom" title="search in previous posts">search</a></li>
+     <li><a href="/cms/tools/login">Login</a></li>
+    </ul>
+   </div>
+   
+   <div id="header">
+    <h1 id="blogtitle">
+        <a href="/">[% fe.config.APP_TITLE %]</a>
+    </h1>
+   </div>
+  </div> <!-- Closes the hnav div-->
+ <div id="masthead" onclick="location.href='/';" style="cursor: pointer;">
+</div> 
+    <br/>
+    <script type="text/javascript"><!--
+    google_ad_client = "pub-3179036797838936";
+    google_ad_width = 728;
+    google_ad_height = 90;
+    google_ad_format = "728x90_as";
+    google_ad_type = "text_image";
+    google_ad_channel ="";
+    google_color_border = "d9d7da";
+    google_color_bg = "FFFFFF";
+    google_color_link = "005D93";
+    google_color_text = "000000";
+    google_color_url = "008000";
+    //--></script>
+    <script type="text/javascript"
+      src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+    </script>
+    <div id="container">
+  <div id="topcontent"></div>
+  <div id="singlecontent">
+    [% IF fe.param('archived') == 1 %]
+       <div class="postnavigation">
+    [% IF next_article %]
+     <div class="right">
+         <a href="/article/archived/[% next_article.id %]/">[% next_article.subject %]</a> &#187;     </div>
+    [% END %]
+    [% IF prev_article %]
+     <div class="left">
+     &#171; <a href="/article/archived/[% prev_article.id %]/">[% prev_article.subject %]</a>     </div>
+    [% END %]
+    </div>
+    [% END %]
+    <div class="singlepost">
+     <div class="title" id="post-[% article.id %]">
+      <a href="/article/archived/[% article.id %]/" rel="bookmark">
+       [% article.subject %] </a>
+     </div>
+     <h3><span class="posted">Posted on </span>
+         [% fe.ai.formatted_date(article.create_time, date_format) %]
+     </h3>
+     <div class="storycontent">
+    [% article.body %]
+        <div align="right" style="color: #005D93; margin: 0; margin-top: 3px; padding: 0; font-size: 0.9em; line-height: 26px; font-weight: normal;">
+            [% IF article.files %]
+                Files:
+                [% FOREACH file = article.files %]
+                <a href="/files/[% file.name %]" title="download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a>
+                [% END %]
+                [% IF article.links %]
+                    <span class="posted">/
+                [% END %]
+            [% END %]
+            [% IF article.links %]
+                Links:
+                [% FOREACH link = article.links %]
+                <a href="[% link.url %]" title="[% link.long_name %]" target="_new">[% link.short_name %]</a>
+                [% END %]
+                </span>
+            [% END %]
+        </div>
+    [% IF fe.param('random') == 1 %]
+        <br>
+        <div align="center">
+            <a href="[% fe.bn_location %]/random/" title="random again?">[?]</a>
+        </div>
+        <br>
+    [% END %]
+    </div>
+
+         <div class="tag_box">
+             [% IF fe.agent_is_robot %]
+               [ [% FOREACH tag = fe.ti.tags('article', article.id) %]
+                   <a href="/tagged/[% tag.name %]/" title="View all posts tagged with [% tag.name %]">[% tag.name %]</a>
+                   <a href="/article/archived/[% article.id %]/" title="view post [% article.subject %]">[% tag.name %]</a>
+                   [% UNLESS tag.is_last %]
+                      /
+                   [% END %]
+                 [% END %]
+               ]
+             [% ELSE %]
+                 [% INCLUDE icon_frame %]
+                 <div class="tag_present_article" id="tag_[% article.id %]">
+                     <img style="margin-top: 3px;" src="[% fe.bn_location %]/theme_images/[% fe.theme %]/mozilla_blu.gif"/>
+                 </div>
+            [% END %]
+         </div>
+
+    </div>
+    <div id="response">
+        <a name="comments"></a>
+   <ol id="commentlist">
+       [% FOREACH comment = article.comments %]
+       <li id="comment-[% comment.id %]">
+     <div class="clearer">&nbsp;</div>
+      <div class="commentname">
+       <span class="commentauthor">
+           [% IF comment.url %] 
+               <a href='[% comment.url %]' rel='external nofollow'>[% comment.name %]</a>    </span>
+           [% ELSE %]
+               [% comment.name %] </span>
+           [% END %]
+      </div>
+      <div class="commentinfo">
+       <span class="commentdate">
+           [% IF comment.subject %]
+           <em>[% comment.subject %]</em> <b>@</b>
+           [% END %]
+           [% fe.ai.formatted_date(comment.create_time, comment_format) %]  |
+         <a href="#comment-[% comment.id %]" title="comment link url">
+          [% fe.ai.formatted_date(comment.create_time, time_format) %]         </a>
+               </span>
+      </div>
+      <div class="clearer">&nbsp;</div>
+      <div class="commenttext">
+        [% comment.comment %] 
+      </div>
+     </li>
+     [% END %]
+   </ol>
+   [% IF article.enable_comments %]
+<h2 id="postcomment">
+Leave a comment</h2>
+<form action="" method="post" id="commentform">
+<script type="text/javascript">
+function ShowInfo() {
+document.getElementById("authorinfo").style.display = "";
+document.getElementById("showinfo").style.display = "none";
+document.getElementById("hideinfo").style.display = "";
+}
+function HideInfo() {
+document.getElementById("authorinfo").style.display = "none";
+document.getElementById("showinfo").style.display = "";
+document.getElementById("hideinfo").style.display = "none";
+}
+</script>
+<div id="inputboxhide">
+
+<div id="commentboxes">
+<p>
+<label for="name">Name</label>
+(required) <br />
+<input type="text" name="name" id="author" class="textarea" value="[% comment_name %]" size="28" tabindex="1" />
+<input type="hidden" name="c_article_id" value="[% article.id %]" />
+<input type="hidden" name="page" value="[% fe.param('page') %]" />
+</p>
+<p>
+<label for="subject">Subject</label>
+(optional) <br />
+<input type="text" name="subject" id="email" value="" size="28" maxlength="64" tabindex="2" />
+</p>
+<p>
+<label for="url"><acronym title="Uniform Resource Identifier">Website URI (optional)</acronym></label><br />
+<input type="text" name="url" id="url" value="[% comment_url %]" size="28" tabindex="3" />
+</p>
+</div>
+<p class="instructions"><b>Information for comment users</b><br />Line and 
+paragraph breaks are implemented automatically. Your e-mail address is <b>never</b> displayed. 
+Please consider what you're posting.<br /><br />
+Use the buttons below to customise your comment.
+<!--<acronym title="Hypertext Markup Language">HTML</acronym> allowed:<code>&lt;a href=&quot;&quot; title=&quot;&quot;&gt; &lt;abbr title=&quot;&quot;&gt; &lt;acronym title=&quot;&quot;&gt; &lt;b&gt; &lt;blockquote cite=&quot;&quot;&gt; &lt;code&gt; &lt;em&gt; &lt;i&gt; &lt;strike&gt; &lt;strong&gt; </code>-->
+</p>
+</div> <!-- Closes the remember author function -->
+
+<div id="inputbox">
+<p class="inputbox">
+<label for="comment">Please type your comment here</label>
+<br />
+<script type="text/javascript">edToolbar();</script>
+<textarea name="comment" id="comment" cols="80" rows="7" tabindex="4"></textarea>
+<script type="text/javascript">var edCanvas = document.getElementById('comment');</script>
+</p>
+</div>
+<div id="button">
+<input name="submit"  type="submit"  tabindex="5" value="Add my comment" />
+</div>
+</form>
+<div id="commentsbottom">&nbsp;</div>
+   [% ELSE %]
+   <div id="commentsclosed">
+   <p>
+    Sorry, the comment form is closed at this time.   </p>
+  </div>
+  [% END %]
+  </div> <!-- closes the response div -->       <div id="bottomcontent"></div>
+  </div>
+ </div>
+<script language="javascript" type="text/javascript">
+   to_load.push('[% article.id %]');
+</script>
+<a name = "bottom"></a>
+<div id="footer">
+ <div id="menu">
+  <form id="searchform" method="get" action="/">
+   <input id="searchbutton" type="submit" name="submit" value="Search" />
+   <input type="text" name="s" id="search" size="25" />
+   <input type="hidden" name="page" value="search" />
+  </form> 
+ <div id="topimage"> 
+  <a href="#"></a>  
+ </div>
+</div>
+<p class="credits"><a href="http://mike.mg2.org">mike.mg2.org</a> is &copy; 2006 Michael Gregorowicz.<br>
+<a href="http://www.brokenkode.com/manji">Rin</a> by Khaled Abou Alfa and Joshua. <br>
+Powered By <a href="http://bndev.mg2.org">[% fe.pretty_version %]</a><br>
+I thought about this page for [% fe.time_taken %] seconds.
+ </p>
+<p class="wordpress"></p>
+</div>
+</body>
+</html>

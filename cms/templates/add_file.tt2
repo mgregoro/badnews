@@ -1,0 +1,48 @@
+[% INCLUDE tool_top %]
+<!-- $Id: add_file.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="90%" cellspacing="0" cellpadding="0" align="center">
+            <tr>
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                </td>
+            </tr>
+            <tr>
+                <td align="left">
+                    <form name="add_file" method="post" action="[% self %]" enctype="multipart/form-data">
+                    File to Upload: <img src="../../theme_images/control_panel/nothing.gif" height="1" width="15">
+                    <input type="file" name="uploaded_file" size="30">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                </td>
+            </tr>
+            <tr>
+                <td align="left" class="header_text">
+                    Description:
+                </td>
+            </tr>
+            <tr>
+                <td align="left">
+                    <textarea name="description" cols="60" rows="8" wrap="virtual"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    <input type="submit" value="Add File">
+                </form>
+                    <img src="../../theme_images/control_panel/nothing.gif" height="1" width="15">
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

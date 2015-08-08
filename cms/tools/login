@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+# $Id: login 428 2006-08-30 02:00:57Z corrupt $
+
+#
+# the login script - sets session information!
+#
+use lib("../../lib");
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'Login',
+                tool_name           =>          'login',
+                description         =>          'Logs you in to the system',
+                menu_position       =>          '_none',
+                sufficient_flags    =>          []
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2)],
+                         TRIM           =>      1});
+
+my $username = $q->param('username');
+my $password = $q->param('password');
+my $logout = $q->param('logout');
+my $session_id = $q->cookie('bnauth');
+my $back = $q->param('back');
+my $error = {login  =>  '&nbsp;'};
+
+if ($username && $password) {
+    my $session = BadNews::Session->new(User        =>      $username,
+                                        Pass        =>      $password);
+                                        
+    if ($session) {
+        my $cookie = $q->cookie(    -name=>     'bnauth',
+                                    -value=>    $session->session_id,
+                                    -path=>     '/',
+                                    -domain=>   $c->COOKIE_DOMAIN);
+        print $q->header(-cookie=>$cookie);
+        if ($back) {
+            $tmpl->process('javascript_redirect.tt2', { title    =>  'Redirecting to ' . $c->APP_TITLE . ' Control Center',
+                                                       location =>  $back});
+        } else {
+            $tmpl->process('javascript_redirect.tt2', { title    =>  'Redirecting to ' . $c->APP_TITLE . ' Control Center',
+                                                       location =>  'cms_main'});
+        }
+        exit();
+    } else {
+        $error->{login} = "Login Incorrect!";
+    }
+} elsif ($session_id) {
+    my $session = BadNews::Session->new(session_id  =>      $session_id);
+    if ($session) {
+        if ($logout) {
+            my $cookie = $q->cookie(    -name=>     'bnauth',
+                                        -value=>    '',
+                                        -path=>     '/',
+                                        -domain=>   $c->COOKIE_DOMAIN);
+            print $q->header(-cookie=>$cookie);
+            $error->{login} = "User " . $session->user . " logged out successfully!\n";
+            $session->close_session();
+            if ($back) {
+                $tmpl->process('javascript_redirect.tt2', { title    =>  'Redirecting to ' . $c->APP_TITLE . ' Control Center',
+                                                           location =>  $back});
+                exit();
+            }
+        } else {
+            print $q->redirect('cms_main');
+            exit();
+        }
+    } else {
+        $error->{login} =  "Session Expired!\n";
+    }
+}
+
+print $q->header();
+$tmpl->process('login.tt2', { title     =>  $c->APP_TITLE . ' CMS Login', error  =>  $error,
+                              back      =>  $back,  version   =>  $bn->version_release});

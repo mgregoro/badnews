@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+# $Id: add_link 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# add link
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+        tool_title          =>          'Add A Link',
+        tool_name           =>          'add_link',
+        description         =>          'Add a link to the content management system',
+        menu_position       =>          '_top, Links',
+        sufficient_flags    =>          ['s', 'a']
+    );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::Links;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>      $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $error = {};
+my $url = $q->param('url');
+my $category = $q->param('category');
+my $short_name = $q->param('short_name');
+my $long_name = $q->param('long_name');
+my $published = $q->param('published');
+$published = defined($published) ? $published : 0;
+
+my $li = BadNews::Links->obj();
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        if ($short_name && $url) {
+
+            # add http://.. unless of course its already there.
+            unless ($url =~ /^\//) {
+                unless ($url =~ /^http[s]*:\/\//) {
+                    $url = 'http://' . $url;
+                }
+            }
+                
+            my $link = BadNews::Links->new( short_name      =>      $short_name,
+                                            long_name       =>      $long_name,
+                                            url             =>      $url,
+                                            published       =>      $published,
+                                            category        =>      $category);
+
+            $bn->log($session->user, 'add_link', $short_name);
+
+            print $q->header();
+            $tmpl->process('t_message.tt2', {   title       =>      'Add A Link',
+                                                error       =>      $error,
+                                                self        =>      'add_link',
+                                                message     =>      'Link to ' . $link->url . ' saved as ' . $link->short_name . ' (Link ID: ' . $link->id . ')',
+                                                tool_name   =>      'Add A Link',
+                                                tool_icon   =>      '../../theme_images/control_panel/01addlink.gif'});
+
+        } else {
+            print $q->header();
+            $tmpl->process('add_link.tt2', { title     =>      'Add A Link',
+                                              error     =>      $error,
+                                              self      =>      'add_link',
+                                              tool_name =>      'Add A Link',
+                                              li        =>      $li,
+                                              tool_icon =>      '../../theme_images/control_panel/01addlink.gif' });
+        }
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

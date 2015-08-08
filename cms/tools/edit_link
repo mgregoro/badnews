@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+# $Id: edit_link 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# edit link
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'Edit A Link',
+                tool_name           =>          'edit_link',
+                description         =>          'Edit an existing link',
+                menu_position       =>          '_none',
+                sufficient_flags    =>          ['s', 'a']
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}  
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::Links;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $error = {};
+my $delete = $q->param('delete');
+my $confirm = $q->param('confirm');
+my $id = $q->param('id');
+my $url = $q->param('url');
+my $category = $q->param('category');
+my $short_name = $q->param('short_name');
+my $long_name = $q->param('long_name');
+my $published = $q->param('published');
+$published = $published ? $published : 0;
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        my $link = BadNews::Links->open($id);
+        if ($link) {
+            if ($delete) {
+                if ($confirm) {
+                    my $id = $link->id;
+                    my $short_name = $link->short_name;
+                    $link->delete;
+                    $bn->log($session->user, 'delete_link', $short_name);
+                    print $q->header();
+                    $tmpl->process('t_message.tt2',     {   title       =>      "Link $id deleted successfully!",
+                                                            error       =>      $error,
+                                                            tool_name   =>      'Edit A Link',
+                                                            tool_icon   =>      '../../theme_images/control_panel/03deletelink.gif',
+                                                            back_to     =>      'list_links',
+                                                            message     =>      "Link $id has been permanently removed from the links database."});
+                } else {
+                    print $q->header();
+                    $tmpl->process('t_prompt.tt2',      {   title       =>      'Delete Link Confirm',
+                                                            error       =>      $error,
+                                                            tool_name   =>      'Edit A Link',
+                                                            no_url      =>      'javascript:window.close();',
+                                                            yes_url     =>      'edit_link?id=' . $link->id . '&delete=1&confirm=1',
+                                                            tool_icon   =>      '../../theme_images/control_panel/03deletelink.gif',
+                                                            question    =>      'Are you sure you want to delete Link ID: ' . $link->id . '?'});
+                }
+                exit();
+            }
+            if ($url && $short_name) {
+                $link->url($url);
+                $link->short_name($short_name);
+                $link->long_name($long_name);
+                $link->category($category);
+                $link->published($published);
+                $link->save;
+                $bn->log($session->user, 'edit_link', $link->short_name);
+                print $q->header();
+                $tmpl->process('t_message.tt2', { title     =>      'Edit A Link',
+                                                  error     =>      $error,
+                                                  self      =>      'edit_link',
+                                                  message   =>      'Link ID: ' . $link->id . ' successfully updated!',
+                                                  tool_name =>      'Edit A Link',
+                                                  back_to   =>      'list_links',
+                                                  tool_icon =>      '../../theme_images/control_panel/03deletelink.gif'});
+            } else {
+                print $q->header();
+                $tmpl->process('edit_link.tt2', { title     =>      'Edit A Link',
+                                                  error     =>      $error,
+                                                  link      =>      $link,
+                                                  self      =>      'edit_link',
+                                                  tool_name =>      'Edit A Link',
+                                                  tool_icon =>      '../../theme_images/control_panel/03deletelink.gif' });
+            }
+        } else {
+            print $q->header();
+            $tmpl->process('t_generic.tt2', { title     =>      'Edit A Link',
+                                              error     =>      $error,
+                                              prompt    =>      'Please enter the link id:',
+                                              fetch     =>      'id',
+                                              action    =>      'edit_link',
+                                              tool_name =>      'Edit A Link',
+                                              tool_icon =>      '../../theme_images/control_panel/03deletelink.gif' });
+        }
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

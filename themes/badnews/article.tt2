@@ -1,0 +1,89 @@
+[% IF fe.cgi.param('article_id') %]
+    [% article = fe.ai.open_article(fe.cgi.param('article_id')) %]
+[% ELSIF fe.cgi.param('article_category') %]
+    [% article = fe.ai.articles_by_category(fe.cgi.param('article_category'), 1) %]
+[% END %]
+[% author = fe.author_by_name(article.author) %]
+<html>
+<!-- $Id: article.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+    <title>[% fe.config.APP_WINDOW_TITLE %]</title>
+        <link href="style/badnews.css" rel="stylesheet" type="text/css">
+    </head>
+    <script language="javascript">
+        function openUrl(url) {
+            var oURL = url;
+            window.open(oURL, "comments", "width=280,height=280,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+    </script>
+    <body>
+        <div class="title_place">[% fe.config.APP_TITLE %]</div>
+        <div class="overlay">the badnews content management system</div>
+    <div class="main_column">
+        <div class="article_spacer"><img src="images/nothing.gif" height="6" width="1"></div>
+        <div class="article">
+            <div class="subject_text">
+                [% article.subject %] <font class="subject_alt">by</font> [% author.common_name %] <font class="subject_alt">@</font> [% fe.ai.pretty_date(article.create_time) %]
+            </div>
+            <p class="body_text">[% article.body %]</p>
+            [% IF article.enable_comments %]
+                [% comment_count = article.count_comments %]
+                [% comment_i = 0 %]
+                [% FOREACH comment = article.comments %]
+                    [% comment_i = comment_i + 1 %]
+                    <div class="comment">
+                        <b>Comment</b> by
+                        [% IF comment.url %]
+                            <a href="[% comment.url %]" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="go to [% comment.url %]">[% comment.name %]</a> <b>@</b> [% fe.ai.pretty_date(comment.create_time) %]<br><br>
+                        [% ELSE %]
+                            [% comment.name %] @ [% fe.ai.pretty_date(comment.create_time) %]<br><br>
+                        [% END %]
+                            [% comment.comment %]
+                    </div>
+                    [% UNLESS comment_i == comment_count %]
+                        <div class="comment_spacer"></div>
+                    [% END %]
+                [% END %]
+            <div class="tiny_text" align="right">
+                <a href="javascript:openUrl('?page=leave_comment&article_id=[% article.id %]')" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'">Leave A Comment</a>
+            </div>
+
+            [% END %]
+            <div class="tiny_text" align="right">
+            [% IF article.files %]
+                Files: 
+                [% FOREACH file = article.files %]
+                <a href="/files/[% file.name %]" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="download file [% file.name %] ([% file.size %] bytes)">[% file.name %]</a> 
+                [% END %]
+                [% IF article.links %]
+                    / 
+                [% END %]
+            [% END %]
+            [% IF article.links %]
+                Links:
+                [% FOREACH link = article.links %]
+                <a href="[% link.url %]" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="[% link.long_name %]" target="_new">[% link.short_name %]</a> 
+                [% END %]
+            [% END %]
+            </div>
+        </div>
+            [% IF article.files || article.links %]
+                <div class="article_spacer"><img src="images/nothing.gif" height="3" width="1"></div>
+            [% END %]
+            [% IF fe.param('archives') == 1 %]
+                <br>
+                <div align="center">
+                    <a href="?page=archive_summary" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="back to the archives">back to the archives</a>
+                </div>
+                <br>
+            [% ELSE %]
+                <br>
+                <div align="center">
+                    <a href="/" onMouseOver="this.style.color='#770000'" onMouseOut="this.style.color='#333333'" title="back to the main page">back to the main page</a>
+                </div>
+                <br>
+            [% END %]
+        </div>
+    </div>
+    </body>
+</html>

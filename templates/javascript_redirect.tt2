@@ -1,0 +1,8 @@
+[% INCLUDE header %]
+<!-- $Id: javascript_redirect.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+
+    <script language='javascript'>
+        document.location='[% location %]';
+    </script>
+
+[% INCLUDE footer %]

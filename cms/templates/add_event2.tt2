@@ -1,0 +1,112 @@
+[% INCLUDE tool_top %]
+<!-- $Id: add_event2.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr>
+    <td>
+        <table width="100%" height="100%" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <table width="80%" height="100%" cellspacing="0" cellpadding="0" align="center">
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="header_text">
+                                Event Sucessfully Added (#[% event.id %])
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="header_text">
+                                Event Start Time:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="normal_text">
+                                [% event.start_day %] @ [% event.start_hms %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="header_text">
+                                Event End Time:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="normal_text">
+                                [% event.end_day %] @ [% event.end_hms %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="header_text">
+                                Event Information:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="normal_text">
+                                Type: [% event.type %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="normal_text">
+                                Place: [% event.place %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="normal_text">
+                                Make Public: [% event.public %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="normal_text">
+                                Short Description: [% event.summary %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="normal_text">
+                                Long Description: [% event.description %]
+                            </td>
+                        </tr>
+                        [% IF event.recurring_event %]
+                        <tr>
+                            <td class="normal_text">
+                                Recur Interval: [% event.recur_interval %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="normal_text">
+                                Recur Until: [% event.recur_day %] @ [% event.recur_hms %]
+                            </td>
+                        </tr>
+                        [% END %]
+                        <tr>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr height="90%" valign="bottom">
+                <td align="right">
+                    <a href="add_event" title="add another event">add another event?</a>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

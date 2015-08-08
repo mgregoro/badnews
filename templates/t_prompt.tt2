@@ -1,0 +1,52 @@
+[% INCLUDE tool_top %]
+<!-- $Id: t_prompt.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="90%" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td colspan="5">
+                                <img src="/images/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" align="center" class="header_text">
+                                [% question %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <img src="/images/nothing.gif" height="25" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="30%">
+                                <img src="/images/nothing.gif" height="1" width="1">
+                            </td>
+                            <td align="center" class="normal_text" width="10%">
+                                <a href="[% yes_url %]">Yes</a>
+                            </td>
+                            <td width="20%">
+                                <img src="/images/nothing.gif" height="1" width="1">
+                            </td>
+                            <td align="center" class="normal_text" width="10%">
+                                <a href="[% no_url %]">No</a>
+                            </td>
+                            <td width="30%">
+                                <img src="/images/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

@@ -1,0 +1,112 @@
+[% dc = fe.draw_calendar(fe.cgi.param('month'), fe.cgi.param('year')) %]
+[% IF fe.cgi.param('filter_type') %]
+    [% filter_type = fe.cgi.param('filter_type') %]
+[% ELSE %]
+    [% filter_type = 'All' %]
+[% END %]
+<!-- $Id: calendar.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<html>
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>Events for [% dc.cal.current_day.monthlong %] [% dc.cal.current_day.year %]</title>
+        <link href="style/ascscyo.css" rel="stylesheet" type="text/css">
+    </head>
+    <script language='javascript'>
+        function pop_open_event(url, arg1, arg2)
+        {
+            var gUrl = url + '?page=' + arg1 + '&event_id=' + arg2;
+            window.open(gUrl, "event" + arg2, "width=540,height=380,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+    </script>
+    <body>
+        <div class="logo_place">
+            <a href="/" border="0"><img border="0" src="/images/blue_logo_fp2.gif"></a>
+        </div>
+        <div class="overlay"></div>
+        <div class="left_column">
+            <div class="title_text">Events for [% dc.cal.current_day.monthlong %] [% dc.cal.current_day.year %]</div>
+            <form name="event_type" action="/" method="post">
+                <input type="hidden" name="page" value="calendar">
+                <input type="hidden" name="month" value="[% dc.cal.current_day.monthnumberbase1 %]">
+                <input type="hidden" name="year" value="[% dc.cal.current_day.year %]">
+                Event Type Filter:&nbsp;&nbsp;<select name="filter_type" onChange="javascript:document.event_type.submit();">
+                    <option selected value="[% filter_type %]">[% filter_type %]</option>
+                    [% FOREACH type = fe.ci.list_event_types %]
+                        [% NEXT IF type == filter_type %]
+                        <option value="[% type %]">[% type %]</option>
+                    [% END %]
+                    [% IF filter_type != "All" %]
+                        <option value="All">All</option>
+                    [% END %]
+                </select>
+                <div align="right">
+                    <a href="/?page=calendar&month=[% dc.last_month %]&year=[% dc.last_month_year %]&filter_type=[% filter_type %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="Go to previous month">Previous Month</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="/?page=calendar&month=[% dc.next_month %]&year=[% dc.next_month_year %]&filter_type=[% filter_type %]" class="ul_link" onMouseOver="this.style.backgroundColor='#7F8EAB'" onMouseOut="this.style.backgroundColor='transparent'" title="Go to next month">Next Month</a>
+                </div>
+            </form>
+            <div class="css_line"></div>
+            [% altrow = 0 %]
+            <table width="95%" border="0" class="normal_text">
+                <tr>
+                    <td width="100%">
+                        <table width="100%" border="0" class="normal_text">
+                            <tr>
+                                <td width="22%">
+                                    <b>Start Time</b>
+                                </td>
+                                <td width="22%">
+                                    <b>End Time</b>
+                                </td>
+                                <td width="10%">
+                                    <b>Place</b>
+                                </td>
+                                <td width="21%">
+                                    <b>Type</b>
+                                </td>
+                                <td width="20%">
+                                    <b>Description</b>
+                                </td>
+                                <td width="5%">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            [% FOREACH event = dc.cal.all_public_events(filter_type) %]
+                <tr>
+                    <td class="paltrow_[% altrow %]" width="100%">
+                        <table width="100%" border="0" class="normal_text">
+                            <tr>
+                                <td class="paltrow_[% altrow %]" width="22%">
+                                    [% event.start_time_short %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="22%">
+                                    [% event.end_time_short %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="10%">
+                                    [% event.place %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="21%">
+                                    [% event.type %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="20%">
+                                    [% event.summary %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="5%">
+                                    <a href="javascript:pop_open_event('/', 'view_event', '[% event.id %]')" title="View event [% event.summary %]" border="0"><img src="/images/mag_glass.gif" alt="A magnifying glass" border="0"></a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            [% IF altrow == 1 %]
+                [% altrow = 0 %]
+            [% ELSE %]
+                [% altrow = 1 %]
+            [% END %]
+            [% END %]
+            </table>
+        </div>
+    </body>
+</html>

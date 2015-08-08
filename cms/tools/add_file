@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+# $Id: add_file 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# add file
+#
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+        tool_title          =>          'Add A File',
+        tool_name           =>          'add_file',
+        description         =>          'Add a file to the file repository',
+        menu_position       =>          '_top, Files',
+        sufficient_flags    =>          ['s', 'a']
+    );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::File;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $error = {};
+
+my $description = $q->param('description');
+my $fn = $q->param('uploaded_file');
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        # since this creates a tmp file... im going to move it inside the session block
+        if ($fn && $description) {
+            my ($file_contents, $type);
+            my $fh = $q->upload('uploaded_file');
+            my $info = $q->uploadInfo($fn);
+            my $ct = $info->{'Content-Type'};
+            $fn =~ s/\s+/_/g;
+
+            # make sure we don't mess with anything else when slurping in this file.!
+            if ($fn) {
+                local $/;
+                $file_contents = <$fh>;
+            }
+
+            if ($ct =~ /image/) {
+                $type = 'image';
+            } elsif ($ct =~ /msword/) {
+                $type = 'document';
+            } elsif ($ct eq 'audio/mpeg') {
+                $type = 'music';
+            } else {
+                $type = 'generic';
+            }
+
+            my $file = BadNews::File->new(      file_name       =>      $fn,
+                                                data            =>      $file_contents,
+                                                description     =>      $description,
+                                                file_type       =>      $type);
+            $bn->log($session->user, 'add_file', $fn);
+            print $q->header();
+            $tmpl->process('t_message.tt2', {   title           =>      'File Added Successfully!',
+                                                error           =>      $error,
+                                                tool_name       =>      'Add A File',
+                                                message         =>      "File '$fn' of type " . $file->file_type . ' added successfully as File ID: ' . $file->id,
+                                                tool_icon       =>      '../../theme_images/control_panel/01addfiles.gif' });
+        } else {
+            print $q->header();
+            $tmpl->process('add_file.tt2', { title     =>      'Add A File ',
+                                              error     =>      $error,
+                                              self      =>      'add_file',
+                                              tool_name =>      'Add A File',
+                                              tool_icon =>      '../../theme_images/control_panel/01addfiles.gif' });
+        }
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

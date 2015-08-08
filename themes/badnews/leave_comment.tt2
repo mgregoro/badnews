@@ -1,0 +1,51 @@
+<html>
+<!-- $Id: leave_comment.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <head>
+        <title>Leave A Comment</title>
+        <link href="style/badnews.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        [% IF fe.param('comment') %]
+            [% article = fe.ai.open_article(fe.param('article_id')) %]
+            [% comment_id = article.add_comment(fe.param('name'), fe.param('url'), fe.ai.parse_body(fe.param('comment'), 1), fe.param('irt')) %]
+
+            [% IF comment_id %]
+                <div class="tiny_text">
+                    Added comment for [% article.subject %].<br>
+                    Comment ID: [% comment_id %]<br>
+                    [% IF fe.param('irt') %]
+                        In reply to comment: [% fe.param('irt') %]
+                    [% END %]
+                </div>
+            [% ELSE %]
+                <div class="tiny_text">
+                    Error adding comment for [% article.subject %].<br>
+                </div>
+            [% END %]
+        [% ELSE %]    
+            <form name="leave_comment" method="POST">
+                <input type="hidden" name="article_id" value="[% fe.param('article_id') %]">
+                <input type="hidden" name="page" value="leave_comment">
+                <input type="hidden" name="irt" value="[% fe.param('irt') %]">
+                <div class="tiny_text" align="left">
+                    Name:
+                </div>
+                <input type="text" size="24" maxlength="128" name="name">
+                <br>
+                <div class="tiny_text" align="left">
+                    Url:
+                </div>
+                <input type="text" size="24" maxlength="128" name="url">
+                <br>
+                <div class="tiny_text" align="left">
+                    Comment:
+                </div>
+                <textarea name="comment" wrap="virtual" rows="5" cols="24"></textarea>
+                <br>
+                <div class="tiny_text" align="right">
+                    <input type="submit" value="Leave Comment" name="submit">
+                </div>
+           </form>
+        [% END %]
+    </body>
+</html>

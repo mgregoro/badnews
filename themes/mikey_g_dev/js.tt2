@@ -1,0 +1,206 @@
+<!-- $Id: js.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <script language="javascript">
+        var expanded = new Array();
+        var fade_colors = new Array(20);
+        var current_color = new Array();
+        fade_colors[0] = '#fff';
+        fade_colors[1] = '#eee';
+        fade_colors[2] = '#ddd';
+        fade_colors[3] = '#ccc';
+        fade_colors[4] = '#bbb';
+        fade_colors[5] = '#aaa';
+        fade_colors[6] = '#999';
+        fade_colors[7] = '#888';
+        fade_colors[8] = '#777';
+        fade_colors[9] = '#666';
+        fade_colors[10] = '#555';
+        fade_colors[11] = '#444';
+        fade_colors[12] = '#333';
+
+        function fadeColors(id) {
+            var element = document.getElementById('c' + id);
+            current_color[id] += 1;
+            if (current_color[id] == 12) {
+                element.style.color = fade_colors[current_color[id]];
+                current_color[id] = 0;
+            } else {
+                element.style.color = fade_colors[current_color[id]];
+                setTimeout('fadeColors("' + id + '")', 100);
+            }
+        }
+
+        function expand(id) {
+            var element = document.getElementById('c' + id);
+            var link = document.getElementById('l' + id);
+            expanded.push("exp=" + id);
+            element.style.display = 'block';
+            element.style.color = '#fff';
+            current_color[id] = 0;
+            setTimeout('fadeColors("' + id + '")', 100);
+            link.firstChild.nodeValue = '[-]';
+            link.href = "javascript:collapse(" + id + ")";
+            link.title = "Collapse comment";
+        }
+
+        function collapse(id) {
+            var element = document.getElementById('c' + id);
+            var link = document.getElementById('l' + id);
+            link.firstChild.nodeValue = '[+]';
+            link.href = "javascript:expand(" + id + ")";
+            link.title = "Expand comment";
+            element.style.display = 'none';
+        }
+
+        function submitForm(form_name) {
+            var form = document.forms[form_name];
+            form.exp.value = expanded.join(',');
+            form.submit();
+        }
+
+        function openUrl(url) {
+            var oURL = url;
+            window.open(oURL, "comments", "width=280,height=280,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+        function commentForm(form_id) {
+            var element = document.getElementById("comment_form_" + form_id);
+            var link = document.getElementById("comment_form_" + form_id + "_link");
+            var current_form = document.forms["leave_comment_" + form_id];
+            var comment_name = "[% comment_name %]";
+            var comment_url = "[% comment_url %]";
+            element.style.display = 'block';
+            link.firstChild.nodeValue = '[cancel]';
+            link.href = "javascript:noCommentForm('" + form_id + "');";
+            current_form.name.value = comment_name;
+            current_form.url.value = comment_url;
+            if (comment_name) {
+                current_form.subject.focus();
+            } else {
+                current_form.subject.focus();
+            }
+        }
+        function noCommentForm(form_id) {
+            var element = document.getElementById("comment_form_" + form_id);
+            var link = document.getElementById("comment_form_" + form_id + "_link");
+            var irt_re = new RegExp("irt");
+            if (irt_re.exec(form_id)) {
+                link.firstChild.nodeValue = '[reply]';
+            } else {
+                link.firstChild.nodeValue = '[comment]';
+            }
+            link.href = "javascript:commentForm('" + form_id + "');";
+            element.style.display = 'none';
+        }
+        function pop_open_event(url, arg1, arg2)
+        {               
+            var gUrl = url + '?page=' + arg1 + '&event_id=' + arg2;
+            window.open(gUrl, "event" + arg2, "width=540,height=380,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+        function pop_open_daycal(url, arg1, arg2, arg3, arg4)
+        {                   
+            var gUrl = url + '?page=' + arg1 + '&day=' + arg2 + '&month=' + arg3 + '&year=' + arg4;
+            window.open(gUrl, "daycal" + arg2 + arg3 + arg4, "width=640, height=480,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+    </script>
+     <script language="javascript">
+        var expanded = new Array();
+        var fade_colors = new Array(20);
+        var current_color = new Array();
+        fade_colors[0] = '#fff';
+        fade_colors[1] = '#eee';
+        fade_colors[2] = '#ddd';
+        fade_colors[3] = '#ccc';
+        fade_colors[4] = '#bbb';
+        fade_colors[5] = '#aaa';
+        fade_colors[6] = '#999';
+        fade_colors[7] = '#888';
+        fade_colors[8] = '#777';
+        fade_colors[9] = '#666';
+        fade_colors[10] = '#555';
+        fade_colors[11] = '#444';
+        fade_colors[12] = '#333';
+
+        function fadeColors(id) {
+            var element = document.getElementById('c' + id);
+            current_color[id] += 1;
+            if (current_color[id] == 12) {
+                element.style.color = fade_colors[current_color[id]];
+                current_color[id] = 0;
+            } else {
+                element.style.color = fade_colors[current_color[id]];
+                setTimeout('fadeColors("' + id + '")', 100);
+            }
+        }
+
+        function expand(id) {
+            var element = document.getElementById('c' + id);
+            var link = document.getElementById('l' + id);
+            expanded.push("exp=" + id);
+            element.style.display = 'block';
+            element.style.color = '#fff';
+            current_color[id] = 0;
+            setTimeout('fadeColors("' + id + '")', 100);
+            link.firstChild.nodeValue = '[-]';
+            link.href = "javascript:collapse(" + id + ")";
+            link.title = "Collapse comment";
+        }
+
+        function collapse(id) {
+            var element = document.getElementById('c' + id);
+            var link = document.getElementById('l' + id);
+            link.firstChild.nodeValue = '[+]';
+            link.href = "javascript:expand(" + id + ")";
+            link.title = "Expand comment";
+            element.style.display = 'none';
+        }
+
+        function submitForm(form_name) {
+            var form = document.forms[form_name];
+            form.exp.value = expanded.join(',');
+            form.submit();
+        }
+
+        function openUrl(url) {
+            var oURL = url;
+            window.open(oURL, "comments", "width=280,height=280,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+        function commentForm(form_id) {
+            var element = document.getElementById("comment_form_" + form_id);
+            var link = document.getElementById("comment_form_" + form_id + "_link");
+            var current_form = document.forms["leave_comment_" + form_id];
+            var comment_name = "[% comment_name %]";
+            var comment_url = "[% comment_url %]";
+            element.style.display = 'block';
+            link.firstChild.nodeValue = '[cancel]';
+            link.href = "javascript:noCommentForm('" + form_id + "');";
+            current_form.name.value = comment_name;
+            current_form.url.value = comment_url;
+            if (comment_name) {
+                current_form.subject.focus();
+            } else {
+                current_form.subject.focus();
+            }
+        }
+        function noCommentForm(form_id) {
+            var element = document.getElementById("comment_form_" + form_id);
+            var link = document.getElementById("comment_form_" + form_id + "_link");
+            var irt_re = new RegExp("irt");
+            if (irt_re.exec(form_id)) {
+                link.firstChild.nodeValue = '[reply]';
+            } else {
+                link.firstChild.nodeValue = '[comment]';
+            }
+            link.href = "javascript:commentForm('" + form_id + "');";
+            element.style.display = 'none';
+        }
+        function pop_open_event(url, arg1, arg2)
+        {               
+            var gUrl = url + '?page=' + arg1 + '&event_id=' + arg2;
+            window.open(gUrl, "event" + arg2, "width=540,height=380,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+        function pop_open_daycal(url, arg1, arg2, arg3, arg4)
+        {                   
+            var gUrl = url + '?page=' + arg1 + '&day=' + arg2 + '&month=' + arg3 + '&year=' + arg4;
+            window.open(gUrl, "daycal" + arg2 + arg3 + arg4, "width=640, height=480,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+    </script>
+ 

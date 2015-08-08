@@ -1,0 +1,68 @@
+[% INCLUDE tool_top %]
+<!-- $Id: list_articles.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="90%" cellspacing="0" cellpadding="0" align="center">
+            <tr>
+                <td>
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="40%" class="header_text" align="left">
+                                Subject
+                            </td>
+                            <td width="15%" class="header_text" align="left">
+                                Category
+                            </td>
+                            <td width="15%" class="header_text" align="left">
+                                Author
+                            </td>
+                            <td width="30%" class="header_text" align="left">
+                                Create Time
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% altrow = 0 %]
+            [% FOREACH article = ai.all_articles %]
+            <tr>
+                <td class="altrow_[% altrow %]">
+                    <table width="100%" align="left" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="40%" class="tiny_text" align="left">
+                                [% article.subject %]
+                            </td>
+                            <td width="15%" class="tiny_text" align="left">
+                                [% article.category %]
+                            </td>
+                            <td width="15%" class="tiny_text" align="left">
+                                [% article.author %]
+                            </td>
+                            <td width="24%" class="tiny_text" align="left">
+                                [% ai.pretty_date(article.create_time) %]
+                            </td>
+                            <td width="3%" class="tiny_text" align="center">
+                                <a href="edit_article?id=[% article.id %]" title="edit article [% article.subject %]...">[e]</a>
+                            </td>
+                            <td width="3%" class="tiny_text" align="center">
+                                <a href="edit_article?id=[% article.id %]&delete=1" title="delete article [% article.subject %]...">[x]</a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            [% IF altrow == 1 %]
+                [% altrow = 0 %]
+            [% ELSE %]
+                [% altrow = 1 %]
+            [% END %]
+            [% END %]
+            <tr valign="top">
+                <td align="right">
+                    &nbsp;
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]

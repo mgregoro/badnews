@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+use BadNews;
+use CGI;
+
+my $bn = new BadNews;
+my $q = new CGI;
+
+my $theme = $q->param('theme');
+my $image = $q->param('image');
+
+my @paths = split(/:/, $bn->c->THEME_PATH);
+
+my ($image_file, $media_type);
+
+foreach my $path (@paths) {
+    $image_file = $path . "/" . $theme . "/images/" . $image;
+    last if -e $image_file;
+    undef $image_file;
+}
+
+unless ($image_file) {
+    print $q->header('text/plain');
+    print "can't find the file: $image\n";
+    die();
+}
+
+# try and get the mime type from the file name
+if ($image =~ /\.gif/) {
+    $media_type = "image/gif";
+} elsif ($image =~ /\.png/) {
+    $media_type = "image/png";
+} elsif ($image =~ /\.jpe?g$/) {
+    $media_type = "image/jpeg";
+} elsif ($image =~ /\.xpm$/) {
+    $media_type = "image/xpm";
+} elsif ($image =~ /\.tif{1,2}/) {
+    $media_type = "image/tiff";
+} else {
+    $media_type = "image/unknown";
+}
+
+my $file_data;
+
+if (open(IMAGE, '<', $image_file)) {
+    local $/;
+    $file_data = <IMAGE>;
+    close(IMAGE);
+} else {
+    print $q->header(-type      =>      'text/plain');
+    print "problem opening image $image_file: $!\n";
+    exit();
+}
+
+# print the header and the data :)
+print $q->header(   -type           =>      $media_type,
+                    -expires        =>      '+3M',
+                    -content_length =>      length($file_data));
+
+print $file_data;

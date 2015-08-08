@@ -1,0 +1,24 @@
+[% event = fe.open_event(fe.cgi.param('event_id')) %]
+[% IF event.show_event %]
+<!-- $Id: view_event.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+    <html>
+        <head>
+            <meta http-equiv="pragma" content="no-cache">
+            <title>[% event.summary %] @ [% event.place %]</title>
+            <link href="style/ascscyo.css" rel="stylesheet" type="text/css">
+        </head>
+        <body>
+            <div class="logo_place">
+                <img src="/images/blue_logo_fp2.gif">
+            </div>
+            <div class="overlay"></div>
+            <div class="left_column">
+                <div class="header_text">[% event.type %]</div>
+                <div class="title_text">[% event.summary %] @ [% event.place %]</div>
+                <p class="normal_text">The event start date and time is <b>[% fe.ci.dim_to_short(event.start_time) %]</b>.<br>The end date and time is <b>[% fe.ci.dim_to_short(event.end_time) %]</b>.<br>  [% event.description %]</p>
+            </div>
+        </body>
+    </html>
+[% ELSE %]
+Event not public
+[% END %]

@@ -1,0 +1,280 @@
+/* stylesheet for mg2.org */
+/* $Id: css_stylesheet.tt2 428 2006-08-30 02:00:57Z corrupt $ */
+
+.article_note {
+    width: 550px;
+    background-color: #FFFF99;
+}
+
+.article_code {
+    width: 550px;
+    background-color: #BCD8E3;
+}
+
+.highlight {
+    background-color: #FF99FF;
+    color: #000000;
+}
+
+.func_exam {
+    font-size: 12px;
+    font-family: courier, terminal, vt100, sans-serif;
+}
+
+.shadow_container {
+    position: relative;
+    background: #777;
+    margin: 4px;
+}
+
+.shadow_content {
+    position: relative;
+    left: -2px;
+    top: -2px;
+}
+
+.comment {
+    text-align: justify;
+    width: 450px;
+    font-size: 11px;
+    margin-left: 60px;
+}
+
+.comment_spacer {
+    width: 400px;
+    margin-left: 60px;
+    height: 10px;
+
+}
+
+.article {
+    text-align: justify;
+    width: 600px;
+}
+
+.article_dotted {
+    border-top: #333 1px dotted;
+    width: 550px;
+}
+
+.css_dotted {
+    border-top: #333 1px dotted;
+    width: 602px;
+}
+
+.article_spacer {
+    height: 6px;
+    width: 600px;
+}
+
+.footer {
+    vertical-align: bottom;
+    text-align: center;
+}
+
+.subject_text {
+    font-size: 16px;
+    color: #FF66FF;
+    font-family: georgia, sans-serif;
+}
+
+.subject_alt {
+    font-size: 18px;
+    color: #0192CB;
+    font-family: georgia, sans-serif;
+}
+
+.overlay {
+    position: absolute;
+    border-top: #888 1px solid;
+    margin-left: 0px;
+    margin-top: 40px;
+    width: 732px;
+}
+
+.main_column {
+    position: absolute;
+    height: 80%;
+    margin-top: 55px;
+    margin-left: 130px;
+}
+
+.cat_place {
+    position: absolute;
+    margin-top: 21px;
+    font-size: 10px;
+    margin-left: 545px;
+}
+
+.count_place {
+    position: absolute;
+    margin-top: 25px;
+    font-size: 10px;
+    margin-left: 545px;
+}
+
+.search_place {
+    position: absolute;
+    margin-top: 21px;
+    font-size: 10px;
+    margin-left: 280px;
+}
+
+.title_place {
+    position: absolute;
+    font-family: arial, helvetica, sans-serif;
+    font-size: 40px;
+    color: #0192CB;
+    vertical-align: bottom;
+    text-align: left;
+    margin-left: 5px;
+    margin-top: 2px;
+    height: 40px;
+}
+
+.flower_place {
+    position: absolute;
+    margin-top: 5px;
+    margin-left: 658px;
+}
+
+.tiny_text {
+    font-size: 10px;
+}
+
+.tiny_red {
+    font-size: 10px;
+    font-weight: bold;
+    color: #993333;
+}
+
+.normal_bold {
+    font-size: 12px;
+    color: #333333;
+    font-weight: bold;
+}
+
+.normal_text {
+    font-size: 12px;
+}
+
+.body_text {
+    font-size: 12px;
+    text-align: justify;
+}
+
+.header_text {
+    font-size: 16px;
+}
+
+.title_text {
+    color: #333333;
+    font-size: 20px;
+}
+
+.bglight {
+    background-color: #999999;
+}
+
+.bgdark {
+    background-color: #666666;
+}
+
+.bgred {
+    background-color: #CC9999;
+}
+
+.red_box {
+    border: black 1px solid;
+    background-color: #AAAAAA;
+    color: #333333;
+}
+
+.grey_box {
+    border: #3399CC 1px solid;
+    background-color: #222222;
+    color: #3399CC;
+}
+
+.white_box {
+    font-family: helvetica, arial, sans-serif;
+    font-size: 12px;
+    border: #993333 1px solid;
+    background-color: #FFFFFF;
+    color: #333333;
+}
+
+.side_line {
+    border-right: #000000 1px solid;
+    background-color: #FFFFFF;
+}
+
+.thin_short {
+    border-top: #000000 1px solid;
+    background-color: #FFFFFF;
+    padding-bottom: 1px;
+    margin-right: 20%;
+    margin-left: 20%;
+}
+
+.thin_line {
+    border-top: #000000 1px solid;
+    background-color: #FFFFFF;
+    padding-bottom: 1px;
+    color: #999999;
+}
+
+.forced_anal {
+    color: #666666;
+    border: #666666 1px solid;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+A {
+    color: #333333;
+    text-decoration: underline;
+}
+
+BODY {
+    font-family: helvetica, arial, sans-serif;
+    font-size: 12px;
+    color: #333333;
+    text-decoration: none;
+    scrollbar-face-color: #0192CB;
+    scrollbar-shadow-color: #777777;
+    scrollbar-highlight-color: #CCCCCC;
+    scrollbar-3dlight-color: #333333;
+    scrollbar-darkshadow-color: #333333;
+    scrollbar-track-color: #FFFFFF;
+    scrollbar-arrow-color: #FF66FF;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+body.iframe {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+TEXTAREA {
+    color: #666666;
+    border: #666666 1px solid;
+}
+
+SELECT {
+    color: #666666;
+    border: #666666 1px solid;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 10px;
+}
+
+INPUT {
+    color: #666666;
+    border: #666666 1px solid;
+}

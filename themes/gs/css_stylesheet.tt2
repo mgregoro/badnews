@@ -1,0 +1,334 @@
+/* these styles are for the calendar widget */
+.calendar {
+	padding: 1px 5px;
+	margin: 0px;
+	font-size: 11px;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+.calendarHeader {
+	font-weight: bold;
+	font-size: 11px;
+	color: #000;
+	background: #ddd;
+	margin:0px;
+	padding: 2px 5px;
+}
+.calendartoday {
+	background-color: #fff;
+	font-weight: bold;
+	text-decoration: underline;
+}
+	
+table.calendar {
+/* only the calendar has a line, not the individual cells */
+	border: 1px solid #000;
+	padding: 0px;
+	width: 175px;
+}
+.calendarHeader a, .calendar a {
+	font-weight: bold;
+	color: #253a69;
+	text-decoration: none;
+}
+/* some default styles for the calendar.. */
+.defcalendar {
+	font-size: 12px;
+}
+.defcalendar td {
+	padding: 1px 4px;
+}
+.defcalendar td:hover {
+	background-color: #ff6;
+}
+.defcalendarlink {
+	font-size: 10px;
+}
+.defcalendartoday {
+	background-color: #ff9;
+	border: 1px solid #999;
+	font-weight: bold;
+}
+/* JM - removed as an inline style for accessibility */
+.calendarHeaderControl {
+	font-size:13px;
+}body {
+	margin: 0px;
+	padding: 0px;
+    background: #54A1BE url(theme_images/[% fe.theme %]/mainbg.gif);
+}
+
+body, p, html, table, td {
+	font-family: tahoma, verdana, geneva, arial, helvetica, sans-serif;
+	font-size: 12px;
+	line-height: 18px;
+}
+
+.singlecont {padding:5px; margin-left:15px; width:80%; background-color:#E6EFF2; border:1px solid #3E778C;}
+
+.entry {
+margin-bottom:20px;
+background-color:#E6EFF2;
+padding: 4px;
+border: 1px solid #666;
+border-right: 2px solid #666;
+border-bottom: 2px solid #666;
+}
+
+.entrycontent {
+	padding: 12px;
+	background: #E6EFF2;
+	border: 1px solid #274C59;
+}
+
+.content p {
+
+}
+
+.pivot-image {
+	/* style for images in entries */
+}
+
+.pivot-popupimage {
+	/* style for popup-images in entries (thumbnails) */
+}
+
+.pivot-popuptext {
+	/* style for popup-images in entries (textual links) */
+}
+
+.registered {
+	background-color: #ff9;
+}
+
+#centercolumn {
+	border: 0px solid #3E778C;
+	margin-left: 201px;
+	margin-right: 201px;
+	padding: 10px 4px;
+}
+
+#archivecentercolumn {
+	border: 0px solid #3E778C;
+	margin-left: 10px;
+	margin-right: 201px;
+	padding: 10px 4px;
+}
+
+#header {
+	border-top: 2px solid #182746;
+	border-bottom: 2px solid #182746;
+	background: #314e8c;
+	padding: 8px;
+}
+
+#leftcolumn {
+	left: 0px;
+	position: absolute;
+	width: 200px;
+	margin-top: 4px;
+}
+
+#rightcolumn {
+	position: absolute;
+	right: 0px;
+	width: 200px;
+	margin-top: 4px;
+}
+
+#leftcolumn, #leftcolumn p, #rightcolumn, #rightcolumn p { 
+	font-size: 11px;
+	line-height: 16px;
+}
+
+#footer {
+	clear: both;
+	margin-bottom:12px;
+}
+
+.block {
+	margin:6px 6px 12px 6px;
+	padding: 4px;
+	background: #E6EFF2;
+	border: 1px solid #3E778C;
+}
+
+
+.block h3 {
+	background: #FFCC66;
+	color: #000000;
+	margin: -4px -4px 4px -4px;
+	padding: 4px;
+	border-bottom: 1px dashed #274C59;
+	font-size: 11px;
+}
+
+.block p {
+	margin: 0px;
+}
+
+h1 {
+	font-size: 16px;
+	margin: 4px;
+	color: #fff;
+	display: inline;
+}
+
+
+h2 {
+	font-size: 11px;
+	background: #FFCC66;
+	padding: 4px;
+	height: 23px;
+	margin: 0;
+	border: 1px dashed #333;
+}
+
+h3 {
+	font-size: 13px;
+}
+
+h4, .subtitle {
+	font-size: 14px;
+	margin: 4px;
+	color: #fff;
+	display: inline;
+	font-style: italic;
+}
+
+h5 {
+        color: #333;
+font-family: tahoma, verdana, geneva, arial, helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: Bold;
+}
+
+.date {
+	color: #666;
+	font-family: tahoma, verdana, geneva, arial, helvetica, sans-serif;
+	font-size: 10px;
+	line-height: 16px;
+	font-weight: normal;
+	float: right;
+}
+
+.date_linkdump {
+	color: #666;
+	font-family: tahoma, verdana, geneva, arial, helvetica, sans-serif;
+	font-size: 10px;
+	line-height: 16px;
+	font-weight: normal;
+	float: right;
+}
+
+.entryfooter {
+	color: #666;
+	font-family: tahoma, verdana, geneva, arial, helvetica, sans-serif;
+	font-size: 11px;
+	line-height: 16px;
+	font-weight: normal;
+	text-align:right;
+	margin: 0px;
+	padding: 6px 0px;
+	clear: both;
+}
+
+.entryfooter_linkdump {
+	color: #666;
+	font-family: tahoma, verdana, geneva, arial, helvetica, sans-serif;
+	font-size: 10px;
+	line-height: 16px;
+	font-weight: normal;
+	text-align:right;
+	margin: 0px;
+	padding: 6px 0px;
+	border-bottom: 1px dashed #666;
+}
+
+.entryfooter a, .date a, .entryfooter_linkdump a, .date_linkdump a {
+	text-decoration: none;
+	font-weight: bold;
+	color: #5c6b8e;
+}
+
+.entryfooter a:hover, .date a:hover {
+
+	text-decoration: underline;
+	font-weight: bold;
+	color: #5c6b8e;
+}
+
+a {
+ color: #253a69;
+}
+
+.prevnext_links {
+	float: right;
+
+	color: #fff;
+}
+
+
+h1 a, .prevnext_links a {
+	color: #fff;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+h1 a:hover, .prevnext_links a:hover {
+	color: #fff;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+/* these styles are for the search boxes */
+.searchbox { 
+	width: 10em; 
+	font-size: 10px;
+}
+
+.searchbutton {
+	border: 1px solid #000;
+	font-size: 10px;
+}
+
+.nextprev {
+	margin-bottom: 5px;
+	margin-top: 5px;
+}
+
+.next {
+	display: block;
+	float: right;
+	margin-top: -1em;
+        text-align: right;
+}
+
+.prev { 
+display: block;
+text-align:left;
+}
+
+blockquote {
+	border: 1px solid #7EACD1;
+	margin: 0;
+	background: #98C3D9;	
+	padding: 0 0 0 5px;
+        margin: 0 0 0 20px;
+	text-align: left;
+	font-size: 9px;
+        width: 90%;
+	}
+
+/* ACCESSIBILITY CHANGES - JM 2004/10/03 */
+/* these hide the accessibility tags to stop the layout from changing */
+
+label { visibility:hidden; display:none; }
+legend { visibility:hidden; display:none; }
+fieldset { border:0; padding:0; margin:0; }
+
+/* this replaces inline style tags */
+img.badge { border:0; margin-bottom:2px; }
+
+/* this is a bonus */
+a img.badge:hover { border-bottom:1px #314e8c solid; margin-bottom:1px; }

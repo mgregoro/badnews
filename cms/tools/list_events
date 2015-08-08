@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+# $Id: list_events 428 2006-08-30 02:00:57Z corrupt $
+use lib('../../lib');
+
+#
+# list events
+#
+
+use vars qw($this_tool);
+
+BEGIN {
+
+    use BadNews::ToolRegistry::Tool;
+
+    $this_tool = BadNews::ToolRegistry::Tool->new(
+                tool_title          =>          'List Events',
+                tool_name           =>          'list_events',
+                description         =>          'List calendar events',
+                menu_position       =>          '_top, Calendar',
+                sufficient_flags    =>          ['s', 'a']
+            );
+
+    if ($ARGV[0] eq "register") {
+        print $this_tool->registration;
+        exit();
+    }
+
+}
+
+use Template;
+use BadNews;
+use BadNews::Session;
+use BadNews::Calendar::Event;
+use BadNews::CalendarInterface;
+use CGI;
+
+my $q = new CGI;
+my $bn = BadNews->new;
+my $c = $bn->c;
+
+my $tmpl = Template->new({INCLUDE_PATH   =>     $c->CMS_PATH . "/templates",
+                         PRE_PROCESS    =>      [qw(header.tt2 footer.tt2 tool_head_foot.tt2)],
+                         TRIM           =>      1});
+
+my $ci = BadNews::CalendarInterface->new();
+my $error = {};
+
+my $filter_type = $q->param('filter_type') ? $q->param('filter_type') : 'All';
+my $old_events = $q->param('old_events') ? $q->param('old_events') : '0';
+
+my $session_id = $q->cookie('bnauth');
+
+if ($session_id) {
+    my $session = BadNews::Session->new(session_id => $session_id);
+    if ($session) {
+        print $q->header();
+        $tmpl->process('list_events.tt2', { title     =>      'List Events',
+                                          error     =>      $error,
+                                          filter_type   =>  $filter_type,
+                                          old_events    =>  $old_events,
+                                          ci        =>      $ci,
+                                          tool_name =>      'List Events',
+                                          tool_icon =>      '../../theme_images/control_panel/02listevents.gif' });
+        exit();
+    } else {
+        print $q->redirect('tools/login?logout=1');
+        exit();
+    }
+} else {
+    print $q->redirect('tools/login');
+    exit();
+}

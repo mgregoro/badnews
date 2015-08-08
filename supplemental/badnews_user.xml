@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<badnews_config version="1.0" badnews_version="0.18">
+    <!-- application title -->
+    <app_title>bndev.mg2.org</app_title>
+
+    <!-- application window title -->
+    <app_window_title>bndev.mg2.org</app_window_title>
+</badnews_config>

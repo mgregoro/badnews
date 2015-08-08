@@ -1,0 +1,106 @@
+[% day = fe.day(fe.cgi.param('month'), fe.cgi.param('day'), fe.cgi.param('year')) %]
+[% IF fe.cgi.param('filter_type') %]
+    [% filter_type = fe.cgi.param('filter_type') %]
+[% ELSE %]
+    [% filter_type = 'All' %]
+[% END %]
+<!-- $Id: calendar_day.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<html>
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>Events for [% day.current_day.monthlong %] [% day.current_day.dayofmonth %], [% day.current_day.year %]</title>
+        <link href="style/badnews.css" rel="stylesheet" type="text/css">
+    </head>
+    <script language='javascript'>
+        function pop_open_event(url, arg1, arg2)
+        {
+            var gUrl = url + '?page=' + arg1 + '&event_id=' + arg2;
+            window.open(gUrl, "event" + arg2, "width=540,height=380,buttons=no,scrollbars=yes,location=no,menubar=no,resizable=yes,status=no,directories=no,toolbar=no");
+        }
+    </script>
+    <body>
+        <div class="overlay"></div>
+        <div class="left_column">
+            <div class="title_text">Events for [% day.current_day.monthlong %] [% day.current_day.dayofmonth %], [% day.current_day.year %]</div>
+            <form name="event_type" action="/" method="post">
+                <input type="hidden" name="page" value="calendar_day">
+                <input type="hidden" name="month" value="[% fe.cgi.param('month') %]">
+                <input type="hidden" name="day" value="[% fe.cgi.param('day') %]">
+                <input type="hidden" name="year" value="[% fe.cgi.param('year') %]">
+                Event Type Filter:&nbsp;&nbsp;<select name="filter_type" onChange="javascript:document.event_type.submit();">
+                    <option selected value="[% filter_type %]">[% filter_type %]</option>
+                    [% FOREACH type = fe.ci.list_event_types %]
+                        [% NEXT IF type == filter_type %]
+                        <option value="[% type %]">[% type %]</option>
+                    [% END %]
+                    [% IF filter_type != "All" %]
+                        <option value="All">All</option>
+                    [% END %]
+                </select>
+            </form>
+            <div class="css_line"></div>
+            [% altrow = 0 %]
+            <table width="95%" border="0" class="normal_text">
+                <tr>
+                    <td width="100%">
+                        <table width="100%" border="0" class="normal_text">
+                            <tr>
+                                <td width="22%">
+                                    <b>Start Time</b>
+                                </td>
+                                <td width="22%">
+                                    <b>End Time</b>
+                                </td>
+                                <td width="10%">
+                                    <b>Place</b>
+                                </td>
+                                <td width="21%">
+                                    <b>Type</b>
+                                </td>
+                                <td width="20%">
+                                    <b>Description</b>
+                                </td>
+                                <td width="5%">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            [% FOREACH event = day.events(filter_type) %]
+                <tr>
+                    <td class="paltrow_[% altrow %]" width="100%">
+                        <table width="100%" border="0" class="normal_text">
+                            <tr>
+                                <td class="paltrow_[% altrow %]" width="22%">
+                                    [% event.start_time_short %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="22%">
+                                    [% event.end_time_short %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="10%">
+                                    [% event.place %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="21%">
+                                    [% event.type %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="20%">
+                                    [% event.summary %]
+                                </td>
+                                <td class="paltrow_[% altrow %]" width="5%">
+                                    <a href="javascript:pop_open_event('/', 'view_event', '[% event.id %]')" title="View event [% event.summary %]" border="0"><img src="/images/mag_glass.gif" alt="A magnifying glass" border="0"></a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            [% IF altrow == 1 %]
+                [% altrow = 0 %]
+            [% ELSE %]
+                [% altrow = 1 %]
+            [% END %]
+            [% END %]
+            </table>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+use lib('../../lib');
+
+# the rss feedah..
+# $Id: rss 428 2006-08-30 02:00:57Z corrupt $
+
+use CGI;
+use XML::RSS;
+use BadNews::ArticleInterface;
+use BadNews::CalendarInterface;
+
+my $ci = new BadNews::CalendarInterface;
+my $ai = new BadNews::ArticleInterface;
+my $q = new CGI;
+my $rss = XML::RSS->new(version     =>      2);
+
+my $category = $q->param('category');
+
+$rss->channel(
+    title               =>      $ai->c->APP_TITLE,
+    link                =>      $ai->c->RSS_SITE_LINK,
+    description         =>      $ai->c->RSS_DESCRIPTION,
+    dc                  =>  {
+        date                =>      $ci->rss_format,
+        subject             =>      $ai->c->RSS_SUBJECT . " (" . $category . ")",
+        creator             =>      $ai->c->RSS_CREATOR,
+        publisher           =>      $ai->c->RSS_PUBLISHER,
+        rights              =>      $ai->c->RSS_COPYRIGHT,
+        language            =>      $ai->c->RSS_LANGUAGE
+    },
+    syn                 =>  {
+        updatePeriod        =>      $ai->c->RSS_SYN_UPDATE_PERIOD,
+        updateFrequency     =>      $ai->c->RSS_SYN_UPDATE_FREQUENCY,
+        updateBase          =>      $ai->c->RSS_SYN_UPDATE_BASE
+    }
+);
+
+# articles by category too :)
+my @articles;
+if ($category) {
+    @articles = $ai->articles_by_category($category, 'create', $ai->c->RSS_NUMBER_OF_ARTICLES);
+} else {
+    @articles = $ai->recent_articles($ai->c->RSS_NUMBER_OF_ARTICLES);
+}
+
+foreach my $article (@articles) {
+    $rss->add_item(
+        title           =>      $article->subject,
+        link            =>      $ai->c->RSS_ARTICLE_URL . $article->id,
+        description     =>      $article->body,
+        dc              =>  {
+            date            =>      $ci->rss_format($article->create_time),
+            subject         =>      $article->category
+        }
+    );
+}
+
+# actually print the feed
+print $q->header("text/xml");
+print $rss->as_string;

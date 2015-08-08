@@ -1,0 +1,129 @@
+[% INCLUDE tool_top %]
+<!-- $Id: edit_link.tt2 428 2006-08-30 02:00:57Z corrupt $ -->
+<tr valign="top">
+    <td>
+        <table width="90%" cellspacing="0" cellpadding="0" align="center">
+            <tr>
+                <td>
+                    <table width="100%" cellspacing="0" cellpadding="0" align="center">
+                        <tr>
+                            <td colspan="3">
+                                <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <form name="edit_link" action="[% self %]" method="post">
+                            <input type="hidden" name="id" value="[% link.id %]">
+                            <td align="left" class="header_text">
+                                Category:
+                            </td>
+                            <td align="left">
+                                <select name="category">
+                                    <option selected value="[% link.category %]">[% link.category %]</option>
+                                    <!-- the link object is really the link interface object.. no point in duplicating -->
+                                    [% FOREACH category = link.list_categories %]
+                                    [% NEXT IF category == link.category %]
+                                    <option value="[% category %]">[% category %]</option>
+                                    [% END %]
+                                </select>
+                            </td>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <img src="../../theme_images/control_panel/nothing.gif" height="5" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" class="header_text">
+                                Link URL:
+                            </td>
+                            <td align="left">
+                                <input type="text" name="url" size="18" value="[% link.url %]" maxlength="128">
+                            </td>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <img src="../../theme_images/control_panel/nothing.gif" height="5" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" class="header_text">
+                                Short Name:
+                            </td>
+                            <td align="left">
+                                <input type="text" name="short_name" value="[% link.short_name %]" size="18" maxlength="128">
+                            </td>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <img src="../../theme_images/control_panel/nothing.gif" height="5" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" class="header_text">
+                                Long Name:
+                            </td>
+                            <td align="left">
+                                <input type="text" name="long_name" value="[% link.long_name %]" size="30" maxlength="128">
+                            </td>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <img src="../../theme_images/control_panel/nothing.gif" height="5" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" class="header_text">
+                                Published:
+                            </td>
+                            <td align="left">
+                            <input type="checkbox" value="1" name="published" [% IF link.published %] checked [% END %]>
+                            </td>
+                            <td>
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <img src="../../theme_images/control_panel/nothing.gif" height="15" width="1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="33%" align="center">
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                            </td>
+                            <td width="33%" align="left">
+                                <input type="submit" value="Submit">
+                            </form>
+                            </td>
+                            <td width="33%" align="center">
+                                <img src="../../theme_images/control_panel/nothing.gif" height="1" width="1">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+            </tr>
+            <script language="javascript">
+                document.edit_link.url.focus();
+            </script>
+        </table>
+    </td>
+</tr>
+[% INCLUDE tool_bottom %]
